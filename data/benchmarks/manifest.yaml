@@ -1,0 +1,38 @@
+schema_version: "2.0"
+benchmarks:
+  - id: golub_leukemia_bioconductor_1_54_0
+    source: https://bioconductor.org/packages/release/data/experiment/src/contrib/golubEsets_1.54.0.tar.gz
+    filename: golubEsets_1.54.0.tar.gz
+    doi: "10.18129/B9.bioc.golubEsets"
+    source_revision: golubEsets_1.54.0
+    retrieval_date: "2026-07-19"
+    schema: "Bioconductor ExpressionSet archive; feature x sample matrix"
+    preprocessing: fixed_feature_level_recipe_documented_in_benchmark_notes
+    license: LGPL
+    sha256: 47c6bbf49322f32c80e63aaf50fab9db16a0a9c42951dc433dc8e84c3bf01f22
+    format: bioconductor_rda_archive
+    claim_role: external_stress_test_only
+  - id: public_agent_trace_adapter_stage_2
+    source: https://github.com/infer-actively/pymdp
+    filename: public_agent_trace_adapter_stage_2.csv
+    doi: ""
+    source_revision: inferactively-pymdp==1.0.3
+    retrieval_date: "2026-07-19"
+    schema: "subject,time,action,observation; chronological binary observation trace"
+    preprocessing: chronological_split_no_leakage
+    license: MIT
+    sha256: 11de9b1dbbdaabf66e5e6ab579287db633deaaeb8f74aa5ee9d5799439b18f8c
+    format: csv
+    claim_role: sequential_stress_test_only
+  - id: golub_normalized_offline_fixture
+    source: https://bioconductor.org/packages/release/data/experiment/src/contrib/golubEsets_1.54.0.tar.gz
+    filename: golub_normalized_fixture.csv
+    doi: "10.18129/B9.bioc.golubEsets"
+    source_revision: golubEsets_1.54.0-normalized-fixture
+    retrieval_date: "2026-07-22"
+    schema: "sample,feature,class,expression; compact normalized numeric projection"
+    preprocessing: "committed offline fixture; z-score-like normalized feature values; no biological claim"
+    license: LGPL
+    sha256: 4e0cbd265402016cb9e9aa75f865da1f3e6aebc5f068b7c2bd813f21250ab789
+    format: csv
+    claim_role: external_stress_test_only

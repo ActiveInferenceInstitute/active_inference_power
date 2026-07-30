@@ -1,0 +1,55 @@
+name: active-inference-power-ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.10.8"
+          python-version: ${{ matrix.python-version }}
+      - run: uv lock --check
+      - run: uv sync --locked --extra dev
+      - run: uv run python -m compileall -q src scripts tests examples
+      - run: uv run ruff check src scripts tests examples
+      - run: uv run mypy src scripts tests examples --ignore-missing-imports
+      - run: uv run python -m pytest tests/ --cov=active_inference_power --cov-branch --cov-fail-under=95 -q
+      - run: uv build --out-dir /tmp/active-inference-power-wheel
+      - run: uv run python -c "import active_inference_power; print(active_inference_power.__name__)"
+      - run: uv venv /tmp/active-inference-power-clean-venv
+      - run: uv pip install --python /tmp/active-inference-power-clean-venv/bin/python /tmp/active-inference-power-wheel/*.whl
+      - run: /tmp/active-inference-power-clean-venv/bin/python -c "import active_inference_power; print(active_inference_power.PowerScenario.__name__)"
+
+  fast-artifacts:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.10.8"
+          python-version: "3.13"
+      - run: uv sync --locked --extra dev
+      - run: uv run python scripts/generate_results.py --profile fast --workers 2 --checkpoint-every 500
+      - run: uv run python scripts/generate_quality_report.py
+      - run: uv run python scripts/z_generate_manuscript_variables.py
+      - run: uv run python scripts/audit_documentation_links.py
+      - run: uv run python scripts/audit_manuscript_presentation.py --resolved-manuscript-dir output/manuscript
+      - run: uv run python scripts/audit_figure_accessibility.py --output-root output
+      # A clean CI checkout has no sibling template renderer. This checks the
+      # source-bound fast bundle without mislabeling it as a release review.
+      - run: uv run python scripts/audit_fast_bundle.py --output-root output
+      - run: uv run python examples/01_reference_power.py --profile fast --output-root output/examples-ci
+      - run: uv run python examples/02_environment_control.py --profile fast --output-root output/examples-ci
+      - run: uv run python examples/03_adaptive_target_selection.py --profile fast --output-root output/examples-ci
+      - run: test "$(uv run python -c 'import json; print(json.load(open("output/manifest.json"))["complete"])')" = "False"
+      - run: test -z "$(rg '\{\{' output/manuscript || true)"

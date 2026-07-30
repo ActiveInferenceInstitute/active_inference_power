@@ -1,0 +1,85 @@
+conditions:
+  - name: correction_comparison
+    role: reference
+    description: "Compare FWER- and FDR-oriented procedures on paired two-groups draws."
+  - name: effect_curve
+    role: variant
+    description: "Trace BH FDR and average power across the configured effect grid."
+  - name: positive_factor_dependence
+    role: variant
+    description: "Evaluate BH and BY under the declared one-sided one-factor regime."
+  - name: active_inference_calibration
+    role: proposed
+    description: "Compare posterior-threshold decisions with BH on calibrated evidence p-values."
+  - name: global_null_control
+    role: reference
+    description: "Verify the global-null Bonferroni FWER control path."
+  - name: calibrated_evidence_control
+    role: proposed
+    description: "Verify that calibrated Binomial evidence p-values can enter BH."
+  - name: positive_factor_boundary
+    role: variant
+    description: "Keep claims scoped to positive one-factor dependence, not arbitrary dependence."
+  - name: negative_and_block_stress
+    role: variant
+    description: "Probe PSD-valid negative equicorrelation and block dependence as finite stress regimes."
+  - name: paired_method_contrasts
+    role: proposed
+    description: "Use common random numbers and simultaneous bands for method-minus-BH contrasts."
+  - name: sequential_validity
+    role: proposed
+    description: "Contrast Ville-valid e-process stopping with invalid fixed-horizon p-value stopping."
+  - name: online_fdr_calibration
+    role: proposed
+    description: "Calibrate exact finite-horizon LORD++ and SAFFRON traces under independent null p-values."
+  - name: agent_controlled_sampling
+    role: proposed
+    description: "Trace fixed, posterior-threshold, and e-process policies with real pymdp integration."
+  - name: offline_benchmark_stress
+    role: variant
+    description: "Load checksum-verified staged trajectories without network access or claim promotion."
+metrics:
+  primary:
+    name: fdr
+    direction: minimize
+protocol: "Use fixed seeds, paired streams for procedure comparisons, and explicit certificate bands."
+expected_figures:
+  - fig:method-comparison
+  - fig:power-curve
+  - fig:dependence
+  - fig:active-inference
+  - fig:certificates
+  - fig:pvalue-calibration
+  - fig:sample-size-precision
+  - fig:paired-contrasts
+  - fig:sequential-evidence
+  - fig:online-fdr
+  - fig:conditional-selection-calibration
+  - fig:benchmark-stress
+  - fig:scholarship-boundary
+  - fig:action-loop-trace
+  - fig:conditional-power-surface
+  - fig:action-policy-frontier
+  - fig:scenario-decomposition
+  - fig:testing-setting-contract
+  - fig:formalism-code-map
+  - fig:formalism-code-map-continued
+  - fig:formalism-code-map-final
+  - fig:adaptive-fdr-audit
+  - fig:computational-complexity
+expected_tables:
+  - tbl:comparison
+  - tbl:powercurve
+  - tbl:dependence
+  - tbl:certificates
+  - tbl:ai
+  - tbl:sample-size
+  - tbl:sequential
+  - tbl:online-fdr
+  - tbl:agent-sampling
+  - tbl:benchmarks
+baselines:
+  - correction_comparison
+ablations:
+  - effect_curve
+  - positive_factor_dependence

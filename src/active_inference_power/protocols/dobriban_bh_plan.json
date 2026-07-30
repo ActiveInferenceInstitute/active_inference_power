@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "model": {
+    "model_id": "bh-two-sided-gaussian-counterexample-v1",
+    "alpha": 0.01,
+    "pi0": 0.96,
+    "rho0": 0.3,
+    "rho1": -0.3,
+    "rho2": -0.72,
+    "mu1": 2.4,
+    "mu2": 4.4,
+    "group_multipliers": [96, 1, 3]
+  },
+  "strata": 1000,
+  "target_entries": 1500000,
+  "rng_bit_generator": "PCG64",
+  "seed_construction": "SeedSequence(master_seed).spawn(1)[0]",
+  "expected_seed_spawn_key": [0],
+  "expected_environment": {
+    "python": "3.12.3",
+    "numpy": "1.26.4",
+    "scipy": "1.14.1",
+    "python_flint": "0.8.0"
+  },
+  "chunks": [
+    {"prefix": "fdr_N50", "N": 50, "block": 1, "master_seed": 20260711, "macro_replications": 100},
+    {"prefix": "fdr_N100_a", "N": 100, "block": 1, "master_seed": 20260712, "macro_replications": 50},
+    {"prefix": "fdr_N100_b", "N": 100, "block": 2, "master_seed": 20260713, "macro_replications": 50},
+    {"prefix": "fdr_N200_a", "N": 200, "block": 1, "master_seed": 20260720, "macro_replications": 25},
+    {"prefix": "fdr_N200_b", "N": 200, "block": 2, "master_seed": 20260721, "macro_replications": 25},
+    {"prefix": "fdr_N200_c", "N": 200, "block": 3, "master_seed": 20260722, "macro_replications": 25},
+    {"prefix": "fdr_N200_d", "N": 200, "block": 4, "master_seed": 20260723, "macro_replications": 25}
+  ]
+}

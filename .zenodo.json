@@ -1,0 +1,31 @@
+{
+  "creators": [
+    {
+      "affiliation": "Active Inference Institute",
+      "name": "Friedman, Daniel Ari",
+      "orcid": "0000-0001-6232-9096"
+    }
+  ],
+  "description": "Source code for Active Inference Power Suite: Conditional Statistical Power under Controlled Generative Settings (2026).",
+  "keywords": [
+    "multiple testing",
+    "false discovery rate",
+    "Benjamini-Hochberg",
+    "statistical power",
+    "active inference",
+    "pymdp",
+    "sequential hypothesis testing",
+    "reproducible research"
+  ],
+  "license": "MIT",
+  "related_identifiers": [
+    {
+      "identifier": "10.5281/zenodo.21695160",
+      "relation": "isVersionOf",
+      "scheme": "doi"
+    }
+  ],
+  "title": "Active Inference Power Suite: Conditional Statistical Power under Controlled Generative Settings",
+  "upload_type": "software",
+  "version": "1.0.0"
+}

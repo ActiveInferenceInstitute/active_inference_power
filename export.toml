@@ -1,0 +1,5 @@
+[template_export]
+cross_root_dependencies = ["infrastructure"]
+project_name = "active_inference_power"
+project_lifecycle = "working"
+render_name = "working/active_inference_power"

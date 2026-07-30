@@ -1,0 +1,85 @@
+# Active Inference Power — statistical power, multiple testing, and active inference
+# Self-contained research package. Domain code lives in the src-layout package;
+# tests enforce the coverage gate with real numerical examples (no mocks).
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "active_inference_power"
+version = "1.0.0"
+description = "Conditional adaptive-study design comparisons, multiple testing, and reproducible FDR evidence"
+authors = [
+    {name = "Daniel Ari Friedman", email = "daniel@activeinference.institute"}
+]
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+dependencies = [
+    "numpy>=1.24.0",
+    "scipy>=1.11.0",
+    "matplotlib>=3.7.0",
+    "pyyaml>=6.0",
+    "inferactively-pymdp==1.0.3",
+]
+
+[project.urls]
+Repository = "https://github.com/ActiveInferenceInstitute/active_inference_power"
+Documentation = "https://github.com/ActiveInferenceInstitute/active_inference_power/tree/v1.0.0/docs"
+"Zenodo concept DOI" = "https://doi.org/10.5281/zenodo.21695160"
+"Zenodo v1.0.0 record" = "https://zenodo.org/records/21695161"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.5.0",
+    "mypy>=1.11.0",
+]
+demo = [
+    "streamlit>=1.38,<2.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+active_inference_power = ["protocols/*.json"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "."]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short --strict-markers"
+markers = [
+    "requires_pymdp: test exercises the real inferactively-pymdp agent",
+    "slow: Monte-Carlo certificate with many replications",
+]
+
+[tool.coverage.run]
+source = ["active_inference_power"]
+branch = true
+omit = [
+    "tests/*",
+    "*/__init__.py",
+    "*/test_*.py",
+]
+
+[tool.coverage.report]
+fail_under = 95
+show_missing = true
+precision = 2
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+]
+
+[tool.mypy]
+# External scientific runtimes do not currently ship complete PEP 561 stubs in
+# the supported environment. Source contracts remain checked while those
+# imports are treated as typed runtime boundaries.
+[[tool.mypy.overrides]]
+module = ["yaml", "yaml.*", "scipy", "scipy.*", "pymdp", "pymdp.*", "streamlit", "streamlit.*"]
+ignore_missing_imports = true

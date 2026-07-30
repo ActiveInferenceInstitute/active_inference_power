@@ -1,0 +1,93 @@
+domain: statistical_methods
+display_name: Active Inference Power Suite
+required_packages:
+  - numpy
+  - scipy
+  - matplotlib
+  - pyyaml
+  - inferactively-pymdp==1.0.3
+preferred_outputs:
+  - pdf
+  - html
+validation_gates:
+  - package_importability
+  - experiment_configuration
+  - certificate_passes
+  - artifact_manifest
+  - evidence_grounding
+  - render_validation
+review_gates:
+  - package_importability
+  - certificate_passes
+  - render_validation
+  - publication_readiness
+figure_types:
+  - method_comparison
+  - power_curve
+  - dependence_sweep
+  - active_inference_policy
+  - action_loop_trace
+  - conditional_power_surface
+  - action_policy_frontier
+  - certificate_summary
+  - pvalue_calibration
+  - sample_size_precision
+  - paired_method_contrasts
+  - sequential_evidence
+  - online_fdr_trace
+  - conditional_selection_calibration
+  - benchmark_stress
+  - scholarship_boundary
+  - scenario_decomposition
+  - testing_setting_contract
+  - formalism_code_map
+  - formalism_code_map_continued
+  - formalism_code_map_final
+  - adaptive_fdr_audit
+  - computational_complexity
+source_policy: "Prefer primary statistical papers, official pymdp documentation, and project-generated artifacts."
+artifact_expectations:
+  - output/results.json
+  - output/formalism_registry.json
+  - output/certificates.json
+  - output/quality.json
+  - output/manifest.json
+  - manuscript/assets/active_inference_power_cover.png
+  - output/figures/method_comparison.png
+  - output/figures/power_curve.png
+  - output/figures/dependence_sweep.png
+  - output/figures/active_inference_policy.png
+  - output/figures/certificate_summary.png
+  - output/figures/action_loop_trace.png
+  - output/figures/conditional_power_surface.png
+  - output/figures/action_policy_frontier.png
+  - output/figures/pvalue_calibration.png
+  - output/figures/sample_size_precision.png
+  - output/figures/paired_method_contrasts.png
+  - output/figures/sequential_evidence.png
+  - output/figures/online_fdr_trace.png
+  - output/figures/conditional_selection_calibration.png
+  - output/figures/benchmark_stress.png
+  - output/figures/scholarship_boundary.png
+  - output/figures/scenario_decomposition.png
+  - output/figures/testing_setting_contract.png
+  - output/figures/formalism_code_map.png
+  - output/figures/formalism_code_map_continued.png
+  - output/figures/formalism_code_map_final.png
+  - output/figures/adaptive_fdr_audit.png
+  - output/figures/computational_complexity.png
+  - output/figures/figure_registry.json
+  - output/review/dashboard.html
+benchmark_rubric:
+  name: statistical-methods-reproducibility
+  dimensions:
+    - name: mathematical_correctness
+      weight: 2.0
+    - name: evidence_grounding
+      weight: 2.0
+    - name: reproducibility_bundle
+      weight: 1.0
+    - name: visual_integrity
+      weight: 1.0
+    - name: publication_readiness
+      weight: 1.0

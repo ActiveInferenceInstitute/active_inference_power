@@ -1,0 +1,128 @@
+# Frozen G2 configuration: expanded conditional-power campaign after the G1
+# method decision.  This standalone source is the exact config witness for
+# output/campaign-v2/; it never rewrites the preserved failed campaign or
+# precision-audit namespaces.
+research_lane:
+  lane_id: conditional_power_campaign_v2_split_stream_primary
+  output_namespace: output/campaign-v2
+  predecessor_evidence:
+    - output/campaign/certificates.json
+    - output/precision/certificates.json
+  decision: >-
+    The same-vector Storey comparison remains an explicit diagnostic after its
+    finite-simulation FDR shortfall. Independent split-stream confirmation is
+    the predeclared adaptive-FDR terminal lane under its stated assumptions.
+  non_claim: >-
+    A terminal pass in this conditional campaign does not establish universal
+    Storey FDR control, arbitrary-dependence validity, or policy optimality.
+
+experiment:
+  suite:
+    name: active_inference_power_suite
+    framing: power_conditional_on_generative_model_process_setting_and_agent_policy
+    reference_scenario: reference_action_loop
+    evidence_roles:
+      synthetic: formal_conditional_evidence_under_declared_assumptions
+      environment_control: conditional_operating_characteristic_and_stress_test
+      benchmark: external_stress_test_only
+    demo:
+      runtime: streamlit
+      offline: true
+  alpha: 0.05
+  m: 200
+  pi0: 0.8
+  effect: 3.0
+  rho: 0.5
+  sided: 1
+  seed: 0
+  n_reps: 10000
+  fast_replication_fraction: 0.3
+  certificate_m: 200
+  certificate_n_reps: 5000
+  certificate_seed: 0
+  # Exact partition of the current five certificate records. A failed
+  # diagnostic remains serialized, hash-bound, and visible; it simply cannot
+  # silently decide the v2 terminal split-stream lane.
+  certificate_gate_policy:
+    terminal:
+      - bh_fdr_control
+      - bonferroni_fwer
+      - positive_dependence
+      - storey_split_confirmation
+    diagnostic:
+      - storey_power_gain
+  active_inference_reps: 1000
+  target_mc_half_width: 0.02
+  mc_confidence: 0.95
+  figure_error_multiplier: 3.0
+  figure_dpi: 300
+  pymdp_version: 1.0.3
+  # Deterministic source-work accounting for every newly generated v2 receipt.
+  # This is deliberately the same bounded plan as the release configuration so
+  # the two ledgers remain comparable.  It is not an elapsed-time benchmark,
+  # simulated resource cost C, e-process evidence E_t, or alpha-wealth W^alpha.
+  computational_complexity:
+    hypothesis_grid: [25, 50, 100, 200, 400, 800]
+    stream_horizon_grid: [16, 32, 64, 128, 256, 512]
+    action_horizon_grid: [2, 4, 8, 12, 16, 32]
+    timing_warmups: 2
+    timing_repetitions: 7
+    correction_methods: [bonferroni, benjamini_hochberg]
+    online_methods: [lord_plus_plus, saffron, e_lond]
+    action_policies: [fixed_horizon, information_gain, cost_aware, e_process]
+  calibration_n_reps: 5000
+  calibration_seed: 2026
+  storey_split_confirmation:
+    lambda: 0.5
+    confidence: 0.99
+    streams: independent_selection_and_confirmation
+  methods:
+    - bonferroni
+    - sidak
+    - holm
+    - hochberg
+    - benjamini_hochberg
+    - benjamini_yekutieli
+    - storey_qvalue
+    - adaptive_bh
+    - weighted_bh
+  effect_grid: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
+  dependence_rhos: [-0.004, 0.0, 0.25, 0.5, 0.75]
+  dependence_block:
+    rho: 0.5
+    block_size: 10
+  active_inference:
+    regimes:
+      strong_evidence:
+        reliability: 0.8
+        threshold: 0.9
+        horizon: 20
+        prior_signal: 0.5
+        replication_fraction: 1.0
+        seed: 0
+      weak_evidence:
+        reliability: 0.62
+        threshold: 0.9
+        horizon: 6
+        prior_signal: 0.5
+        replication_fraction: 1.0
+        seed: 1
+  action_loop:
+    horizon: 12
+    policies: [fixed_horizon, posterior_threshold, information_gain, cost_aware, adaptive_target, posterior_sampling, e_process]
+    reliability_grid: [0.65, 0.8, 0.92]
+    target_selection_method: lord_plus_plus
+    split_confirmation_steps: 12
+    learned_policy_train_reps: 16
+    learned_policy_cost_penalty: 0.02
+  campaign:
+    name: expanded_conditional_power_campaign_v2_split_stream_primary
+    n_reps: 15000
+    certificate_n_reps: 7500
+    active_inference_reps: 1500
+    calibration_n_reps: 7500
+    target_mc_half_width: 0.015
+    effect_grid: [0.0, 0.25, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0]
+    dependence_rhos: [-0.004, 0.0, 0.125, 0.25, 0.5, 0.75, 0.9]
+    action_loop:
+      reliability_grid: [0.55, 0.65, 0.8, 0.92, 0.98]

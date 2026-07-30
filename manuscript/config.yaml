@@ -1,0 +1,203 @@
+# Active Inference Power — single source of experiment and publication policy.
+# scripts/generate_results.py consumes experiment.*; manuscript variables consume
+# the resulting JSON artifact; no result prose should be hand-transcribed.
+
+paper:
+  title: "Active Inference Power Suite: Conditional Statistical Power under Controlled Generative Settings"
+  subtitle: "Connecting generative-model formalisms to executable action-in-the-loop evidence"
+  version: "1.0.0"
+  date: "2026-07-29"
+  cover:
+    image: "assets/active_inference_power_cover.png"
+    title: "Inference under control"
+    description: "Editorial scientific cover art connecting latent-state beliefs, calibrated evidence, and family-level decision control."
+
+authors:
+  - name: "Daniel Ari Friedman"
+    orcid: "0000-0001-6232-9096"
+    email: "daniel@activeinference.institute"
+    affiliation: "Active Inference Institute"
+    corresponding: true
+
+publication:
+  # This is the v1 publication state. The DOI pair was reserved from the
+  # production Zenodo draft for this exact release; never use placeholders.
+  status: "published"
+  # The controlled renderer shows this neutral line only before a real DOI is
+  # configured. A verified publication.doi replaces it with a linked cover DOI.
+  doi_status: "to be assigned at publication"
+  doi: "10.5281/zenodo.21695160"
+  version_doi: "10.5281/zenodo.21695161"
+  version_record: "https://zenodo.org/records/21695161"
+  zenodo_deposition_id: "21695161"
+  github_repository: "ActiveInferenceInstitute/active_inference_power"
+  repository_url: "https://github.com/ActiveInferenceInstitute/active_inference_power"
+  github_release_tag: "v1.0.0"
+  github_release_url: "https://github.com/ActiveInferenceInstitute/active_inference_power/releases/tag/v1.0.0"
+  planned_github_repository: "ActiveInferenceInstitute/active_inference_power"
+  planned_repository_url: "https://github.com/ActiveInferenceInstitute/active_inference_power"
+  journal: ""
+  year: "2026"
+
+keywords:
+  - "multiple testing"
+  - "false discovery rate"
+  - "Benjamini-Hochberg"
+  - "statistical power"
+  - "active inference"
+  - "pymdp"
+  - "sequential hypothesis testing"
+  - "reproducible research"
+
+metadata:
+  license: "MIT"
+  language: "en"
+
+# Steganography disabled for this working draft.
+steganography:
+  enabled: false
+
+render:
+  formats:
+    pdf: true
+    html: true
+    slides: false
+    docx: false
+    epub: false
+
+# Publication layout controls consumed by the controlled release renderer.
+# The figure bound is high enough for matrix text and action-loop annotations
+# to remain readable. Explicit breaks beside multi-page figures preserve
+# local caption/table separation; automatic breaks between every manuscript
+# source file would otherwise create sparse reader-guide pages. These controls
+# change layout only, never scientific values.
+rendering:
+  section_breaks: false
+  figure_height_fraction: 0.65
+  cover_height_fraction: 0.60
+  front_matter_figure_height_fraction: 0.75
+
+# LLM review/translation off for the working draft (opt in later).
+llm:
+  reviews:
+    enabled: false
+  translations:
+    enabled: false
+
+testing:
+  max_test_failures: 0
+  max_infra_test_failures: 0
+  max_project_test_failures: 0
+
+# Canonical experiment parameters consumed by scripts + certificates.
+# These are the default release settings; the CLI profile controls fast smoke
+# and expanded campaign scaling without changing this source configuration.
+experiment:
+  suite:
+    name: "active_inference_power_suite"
+    framing: "power_conditional_on_generative_model_process_setting_and_agent_policy"
+    reference_scenario: "reference_action_loop"
+    evidence_roles:
+      synthetic: "formal_conditional_evidence_under_declared_assumptions"
+      environment_control: "conditional_operating_characteristic_and_stress_test"
+      benchmark: "external_stress_test_only"
+    demo:
+      runtime: "streamlit"
+      offline: true
+  alpha: 0.05
+  m: 200                 # number of simultaneous hypotheses
+  pi0: 0.8               # fraction of true nulls
+  effect: 3.0            # alternative mean shift (null-SD units)
+  rho: 0.5              # positive-factor correlation for the dependence certificate
+  sided: 1
+  seed: 0
+  n_reps: 10000          # Monte-Carlo replications (release profile)
+  fast_replication_fraction: 0.3
+  certificate_m: 200
+  certificate_n_reps: 5000
+  certificate_seed: 0
+  certificate_gate_policy:
+    terminal: [bh_fdr_control, bonferroni_fwer, positive_dependence, storey_power_gain, storey_split_confirmation]
+    diagnostic: []
+  active_inference_reps: 1000
+  target_mc_half_width: 0.02
+  mc_confidence: 0.95
+  figure_error_multiplier: 3.0
+  figure_dpi: 300
+  pymdp_version: "1.0.3"
+  # Source-work curves are release provenance accounting; repeated wall-time measurements
+  # use this same frozen plan only in the separate, non-promoted local
+  # diagnostic lane. Neither quantity is simulated resource cost C, e-process
+  # evidence E_t, or online alpha-wealth W^alpha.
+  computational_complexity:
+    hypothesis_grid: [25, 50, 100, 200, 400, 800]
+    stream_horizon_grid: [16, 32, 64, 128, 256, 512]
+    action_horizon_grid: [2, 4, 8, 12, 16, 32]
+    timing_warmups: 2
+    timing_repetitions: 7
+    correction_methods: [bonferroni, benjamini_hochberg]
+    online_methods: [lord_plus_plus, saffron, e_lond]
+    action_policies: [fixed_horizon, information_gain, cost_aware, e_process]
+  calibration_n_reps: 5000
+  calibration_seed: 2026
+  # Preregistered split-stream Storey review: selection estimates are never
+  # reused as confirmation evidence. This is a conditional calibration lane,
+  # not an arbitrary-dependence theorem.
+  storey_split_confirmation:
+    lambda: 0.5
+    confidence: 0.99
+    streams: independent_selection_and_confirmation
+  methods:
+    - bonferroni
+    - sidak
+    - holm
+    - hochberg
+    - benjamini_hochberg
+    - benjamini_yekutieli
+    - storey_qvalue
+    - adaptive_bh
+    - weighted_bh
+  effect_grid: [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0]
+  dependence_rhos: [-0.004, 0.0, 0.25, 0.5, 0.75]
+  dependence_block:
+    rho: 0.5
+    block_size: 10
+  # Active-inference sequential-testing policy defaults
+  active_inference:
+    regimes:
+      strong_evidence:
+        reliability: 0.8
+        threshold: 0.9
+        horizon: 20
+        prior_signal: 0.5
+        replication_fraction: 1.0
+        seed: 0
+      weak_evidence:
+        reliability: 0.62
+        threshold: 0.9
+        horizon: 6
+        prior_signal: 0.5
+        replication_fraction: 1.0
+        seed: 1
+  action_loop:
+    horizon: 12
+    policies: [fixed_horizon, posterior_threshold, information_gain, cost_aware, adaptive_target, posterior_sampling, e_process]
+    reliability_grid: [0.65, 0.8, 0.92]
+    target_selection_method: lord_plus_plus
+    split_confirmation_steps: 12
+    learned_policy_train_reps: 16
+    learned_policy_cost_penalty: 0.02
+  # A separately materialized sensitivity campaign. It intentionally does not
+  # replace the release anchor: larger grids and replication budgets quantify
+  # conditional operating characteristics, not universal power.
+  campaign:
+    name: "expanded_conditional_power_campaign_v1"
+    n_reps: 15000
+    certificate_n_reps: 7500
+    active_inference_reps: 1500
+    calibration_n_reps: 7500
+    target_mc_half_width: 0.015
+    effect_grid: [0.0, 0.25, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 6.0]
+    dependence_rhos: [-0.004, 0.0, 0.125, 0.25, 0.5, 0.75, 0.9]
+    action_loop:
+      reliability_grid: [0.55, 0.65, 0.8, 0.92, 0.98]

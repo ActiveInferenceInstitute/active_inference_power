@@ -1,0 +1,28 @@
+.coverage
+.coverage.*
+.pytest_cache/
+__pycache__/
+*.pyc
+.benchmarks/
+
+# Egg-info from local installs (any location — guards against renamed-fork drift).
+**/*.egg-info/
+
+# Project-local virtualenvs (root .venv is shared)
+.venv/
+
+# Local credentials and review-only working material must never enter a public
+# source tree.  Keep an intentional, documented example available if one is
+# added later.
+.env
+.env.*
+!.env.example
+tmp/
+.mypy_cache/
+.ruff_cache/
+
+# Generated research artifacts (regenerable from source and configuration)
+output/
+
+# Setuptools build tree produced by local wheel/sdist builds.
+build/

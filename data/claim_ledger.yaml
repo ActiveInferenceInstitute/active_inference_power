@@ -1,0 +1,563 @@
+claims:
+  - claim_id: configured-hypothesis-count
+    kind: configuration
+    source: manuscript/config.yaml:experiment.m
+    source_tier: project_source
+    freshness: generated
+    artifact_path: output/results.json
+  - claim_id: configured-significance-level
+    kind: configuration
+    source: manuscript/config.yaml:experiment.alpha
+    source_tier: project_source
+    freshness: generated
+    artifact_path: output/results.json
+  - claim_id: certificate-pass-status
+    kind: verdict
+    evidence_class: calibration_diagnostic
+    non_claim: A finite certificate pass does not prove a theorem or validate an untested regime.
+    source: src/active_inference_power/certificates.py:run_all_certificates
+    source_tier: generated_metric
+    freshness: generated
+    artifact_path: output/certificates.json
+  - claim_id: active-inference-calibration-comparison
+    kind: empirical_comparison
+    evidence_class: conditional_operating_characteristic
+    non_claim: The comparison does not establish a universal threshold or agent-level error guarantee.
+    source: src/active_inference_power/active_inference.py:evaluate_ai_regime
+    source_tier: generated_metric
+    freshness: generated
+    artifact_path: output/results.json
+  - claim_id: publication-figure-resolution
+    kind: rendering_policy
+    value: generated_from_experiment_figure_dpi
+    unit: dpi
+    source: manuscript/config.yaml:experiment.figure_dpi
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/figures/figure_registry.json
+  - claim_id: manuscript-quantitative-injection
+    kind: provenance_contract
+    value: every_live_numeric_token_resolved_from_config_results_or_quality
+    source: src/active_inference_power/manuscript_variables.py:generate_variables
+    source_tier: generated_metric
+    freshness: generated
+    artifact_path: output/data/manuscript_variables.json
+  - claim_id: release-sample-accounting
+    kind: computation_policy
+    value: release_profile_replication_units_and_raw_draws_are_recorded_separately
+    source: scripts/generate_results.py:_sample_size_accounting
+    source_tier: generated_metric
+    freshness: generated
+    artifact_path: output/results.json
+  - claim_id: expanded-campaign-sample-accounting
+    kind: computation_policy
+    evidence_class: conditional_operating_characteristic
+    non_claim: Larger replication budgets and broader grids reduce Monte-Carlo uncertainty but do not establish universal power, arbitrary-dependence validity, or policy optimality.
+    value: campaign_v1_15000_main_1500_action_7500_certificates_7500_calibration
+    source: manuscript/config.yaml:experiment.campaign
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/campaign/results.json
+  - claim_id: publication-caption-provenance
+    kind: rendering_policy
+    value: registry_dashboard_and_manuscript_share_result_derived_captions_and_sample_size_context
+    source: src/active_inference_power/figures/__init__.py:figure_captions, figure_metadata
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/figures/figure_registry.json
+  - claim_id: figure-evidence-contract
+    kind: provenance_contract
+    value: every_figure_registry_record_declares_estimand_uncertainty_sample_size_scenario_lineage_and_validity_boundary
+    source: src/active_inference_power/figures/__init__.py:figure_metadata
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/figures/figure_registry.json
+  - claim_id: active-inference-process-theory-grounding
+    kind: citation
+    value: friston2017active_process
+    source: manuscript/references.bib:friston2017active_process
+    source_tier: bibliography
+    freshness: active
+    artifact_path: manuscript/references.bib
+  - claim_id: design-based-power-grounding
+    kind: citation
+    value: neyman1933efficient
+    source: manuscript/references.bib:neyman1933efficient
+    source_tier: bibliography
+    freshness: active
+    artifact_path: manuscript/references.bib
+  - claim_id: weighted-bh-literature-grounding
+    kind: citation
+    value: benjamini1997weighted
+    source: manuscript/references.bib:benjamini1997weighted
+    source_tier: bibliography
+    freshness: active
+    artifact_path: manuscript/references.bib
+  - claim_id: fair-artifact-provenance
+    kind: citation
+    value: wilkinson2016fair
+    source: manuscript/references.bib:wilkinson2016fair
+    source_tier: bibliography
+    freshness: active
+    artifact_path: manuscript/references.bib
+  - claim_id: discrete-active-inference-grounding
+    kind: citation
+    value: dacosta2020discrete
+    source: manuscript/references.bib:dacosta2020discrete
+    source_tier: bibliography
+    freshness: active
+    artifact_path: manuscript/references.bib
+  - claim_id: sequential-evidence-boundary
+    kind: citation
+    value: shafer2011test_martingales
+    source: manuscript/references.bib:shafer2011test_martingales
+    source_tier: bibliography
+    freshness: active
+    artifact_path: manuscript/references.bib
+  - claim_id: optional-continuation-boundary
+    kind: citation
+    value: grunwald2024safe
+    source: manuscript/references.bib:grunwald2024safe
+    source_tier: bibliography
+    freshness: active
+    artifact_path: manuscript/references.bib
+  - claim_id: lord-online-fdr-grounding
+    kind: citation
+    value: javanmard2018online
+    source: manuscript/references.bib:javanmard2018online
+    source_tier: bibliography
+    freshness: active
+    artifact_path: manuscript/references.bib
+  - claim_id: weighted-bh-assumption-boundary
+    kind: validity_boundary
+    evidence_class: formal_conditional
+    non_claim: Fixed-weight assumptions do not justify weights estimated from the same p-values or arbitrary dependence.
+    value: fixed_positive_weights_under_independence_or_declared_PRDS_regime
+    source: src/active_inference_power/corrections.py:weighted_bh
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/results.json
+  - claim_id: negative-and-block-dependence-stress
+    kind: empirical_stress_test
+    evidence_class: stress_test
+    non_claim: These finite regimes do not establish arbitrary-dependence validity or a universal method ranking.
+    value: finite_simulation_only
+    source: src/active_inference_power/dependence.py
+    source_tier: generated_metric
+    freshness: generated
+    artifact_path: output/results.json
+  - claim_id: time-uniform-e-process-validity
+    kind: validity_boundary
+    evidence_class: formal_conditional
+    non_claim: The Bernoulli likelihood-ratio contract does not validate optional stopping for misspecified or action-dependent streams.
+    value: Ville_bound_under_declared_Bernoulli_null
+    source: src/active_inference_power/sequential.py:binary_e_process
+    source_tier: cited_theory
+    freshness: active
+    artifact_path: output/results.json
+  - claim_id: online-fdr-finite-calibration
+    kind: empirical_stress_test
+    evidence_class: calibration_diagnostic
+    non_claim: Finite LORD++, SAFFRON, and e-LOND traces are not a new online-FDR proof or a post-selection validity certificate.
+    value: auditable_LORD++_conservatively_capped_SAFFRON_and_e_LOND_traces_with_Wilson_intervals
+    source: src/active_inference_power/online_fdr.py:lord_plus_plus,saffron,e_lond
+    source_tier: generated_metric
+    freshness: generated
+    artifact_path: output/results.json
+  - claim_id: benchmark-stress-only
+    kind: validity_boundary
+    evidence_class: stress_test
+    non_claim: External benchmark behavior cannot upgrade synthetic assumptions into universal guarantees.
+    value: external_benchmarks_do_not_upgrade_synthetic_guarantees
+    source: data/benchmarks/manifest.yaml
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/results.json
+  - claim_id: scholarship-boundary-map
+    kind: provenance_contract
+    value: literature_roles_implementation_evidence_and_nonclaims_are_registered
+    source: src/active_inference_power/figures/__init__.py:_scholarship_boundary
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/figures/figure_registry.json
+  - claim_id: conditional-power-suite-functional
+    kind: scope_definition
+    evidence_class: conditional_operating_characteristic
+    non_claim: Power is not an unconditional property of an agent, procedure, task environment, or benchmark.
+    value: investigator_estimates_replication_mean_tpr_for_declared_model_process_setting_policy_design
+    source: src/active_inference_power/action_statistics.py:summarize_action_traces
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/results.json
+  - claim_id: scenario-surface-lineage-identifiers
+    kind: provenance_contract
+    evidence_class: provenance_contract
+    non_claim: A unique surface identifier improves indexing and auditability but does not strengthen the statistical assumptions or validity of a scenario.
+    value: required_unique_scenario_identifiers_and_configuration_hashes_match_serialized_contracts
+    source: src/active_inference_power/schema.py:validate_suite_result
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/results.json
+  - claim_id: action-loop-hidden-state-separation
+    kind: validity_boundary
+    evidence_class: provenance_contract
+    non_claim: Separating evaluation truth from visible inputs does not prove a policy is statistically valid.
+    value: hidden_evaluation_states_are_separate_from_agent_visible_trace
+    source: src/active_inference_power/action_loop.py:ActionLoopStep
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/results.json
+  - claim_id: environment-control-stress-boundary
+    kind: validity_boundary
+    evidence_class: stress_test
+    non_claim: Action-dependent environment control is not a general active-inference or family-level validity theorem.
+    value: action_dependent_environment_results_are_conditional_or_diagnostic_unless_evidence_assumptions_are_certified
+    source: docs/action_in_the_loop.md
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/results.json
+  - claim_id: dynamic-schedule-extrapolation-contract
+    kind: process_contract
+    evidence_class: provenance_contract
+    non_claim: An explicit schedule rule prevents ambiguity but does not make a dynamic or nonstationary process realistic or inferentially valid.
+    value: schedules_must_declare_hold_last_cycle_or_strict_extrapolation
+    source: src/active_inference_power/scenario.py:GenerativeProcessSpec
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/results.json
+  - claim_id: action-policy-operating-characteristics
+    kind: empirical_operating_characteristic
+    evidence_class: conditional_operating_characteristic
+    non_claim: Power-cost frontiers are conditional design comparisons, not policy optimality or utility theorems.
+    value: replication_level_power_fdr_fwer_target_rates_cost_stopping_and_power_per_cost
+    source: src/active_inference_power/action_statistics.py
+    source_tier: generated_metric
+    freshness: generated
+    artifact_path: output/action_loop_suite.json
+  - claim_id: paired-action-policy-contrast-boundary
+    kind: validity_boundary
+    evidence_class: conditional_operating_characteristic
+    non_claim: Common-random-number contrasts do not imply identical trajectories, causal effects, or universal rankings.
+    value: common_seed_paired_contrasts_are_conditional_design_comparisons_not_policy_optimality_results
+    source: src/active_inference_power/action_statistics.py:paired_action_policy_comparisons
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/action_loop_suite.json
+  - claim_id: selective-inference-boundary
+    kind: citation
+    value: fithian2014selective
+    source: manuscript/references.bib:fithian2014selective
+    source_tier: bibliography
+    freshness: active
+    artifact_path: docs/research_roadmap.md
+  - claim_id: time-uniform-concentration-grounding
+    kind: citation
+    value: howard2020time_uniform
+    source: manuscript/references.bib:howard2020time_uniform
+    source_tier: bibliography
+    freshness: active
+    artifact_path: docs/research_roadmap.md
+  - claim_id: confidence-sequence-grounding
+    kind: citation
+    value: howard2021confidence_sequences
+    source: manuscript/references.bib:howard2021confidence_sequences
+    source_tier: bibliography
+    freshness: active
+    artifact_path: docs/research_roadmap.md
+  - claim_id: scoped-research-roadmap
+    kind: process_contract
+    value: staged_claim_expansion_with_entry_criteria_and_nonclaims
+    source: docs/research_roadmap.md
+    source_tier: project_source
+    freshness: active
+    artifact_path: docs/research_roadmap.md
+  - claim_id: formalism-to-code-registry
+    kind: provenance_contract
+    value: every_declared_formal_object_names_code_symbols_tests_assumptions_evidence_and_nonclaim
+    source: src/active_inference_power/formalism.py:formalism_registry
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/formalism_registry.json
+  - claim_id: formalism-registry-validation
+    kind: schema_contract
+    evidence_class: provenance_contract
+    non_claim: Hash validation connects artifacts to code but does not establish statistical validity.
+    value: generated_formalism_registry_is_hash_checked_against_the_executable_package
+    source: src/active_inference_power/formalism.py:validate_formalism_registry
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/manifest.json
+  - claim_id: claim-audit-protocol
+    kind: process_contract
+    value: claims_are_reviewed_as_formal_object_code_test_artifact_and_nonclaim_chains
+    source: docs/claim_audit.md
+    source_tier: project_source
+    freshness: active
+    artifact_path: data/claim_ledger.yaml
+  - claim_id: action-loop-e-process-channel-contract
+    kind: validity_boundary
+    evidence_class: formal_conditional
+    value: optional_stopping_requires_state_invariant_binary_rates_within_each_target_truth_cell
+    non_claim: Context-dependent emissions remain diagnostic even when truth is static and selection is chronological.
+    source: src/active_inference_power/action_loop.py:_e_process_contract_valid
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/action_loop_suite.json
+  - claim_id: paired-policy-common-random-numbers
+    kind: computation_policy
+    value: environment_and_policy_child_streams_are_separated_and_replication_order_is_stable
+    source: src/active_inference_power/action_loop.py:simulate_action_loop
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/action_loop_suite.json
+  - claim_id: selected-target-null-calibration
+    kind: empirical_stress_test
+    evidence_class: calibration_diagnostic
+    non_claim: An all-null DKW diagnostic for one declared process and policy does not establish selective-inference validity or arbitrary adaptive-selection guarantees.
+    value: selected_target_pvalue_ecdf_excess_with_dkw_radius_and_explicit_all_null_process
+    source: src/active_inference_power/suite.py:evaluate_conditional_selection_calibration
+    source_tier: generated_metric
+    freshness: generated
+    artifact_path: output/action_loop_suite.json
+  - claim_id: future-evidence-selection-failure-contrast
+    kind: empirical_stress_test
+    evidence_class: stress_test
+    non_claim: A post-hoc minimum-p contrast deliberately violates the visible-history filtration and cannot support online-FDR or selective-inference validity.
+    value: full-trace-minimum-p-selection_is_an_explicit_invalid_contrast
+    source: src/active_inference_power/suite.py:evaluate_future_evidence_selection_failure
+    source_tier: generated_metric
+    freshness: generated
+    artifact_path: output/action_loop_suite.json
+  - claim_id: split-stream-confirmation-contract
+    kind: validity_boundary
+    evidence_class: formal_conditional
+    value: independent_selection_and_confirmation_streams_with_visible_filtration
+    non_claim: Split-stream confirmation does not validate misspecified processes or same-stream post-selection inference.
+    source: src/active_inference_power/selection.py:run_split_stream_confirmation
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/action_loop_suite.json
+  - claim_id: split-stream-confirmation-operating-characteristic
+    kind: empirical_operating_characteristic
+    evidence_class: conditional_operating_characteristic
+    value: selected_true_prevalence_joint_and_conditional_confirmation_rejection_and_false_rejection_rates
+    non_claim: Finite split-stream operating characteristics are conditional on the declared scenario and seed design.
+    source: src/active_inference_power/selection.py:simulate_split_stream_confirmation
+    source_tier: generated_metric
+    freshness: generated
+    artifact_path: output/action_loop_suite.json
+  - claim_id: confidence-sequence-evidence-boundary
+    kind: validity_boundary
+    evidence_class: formal_conditional
+    value: Bernoulli_beta_mixture_e_process_inversion
+    non_claim: The confidence sequence does not establish time-uniform validity for arbitrary hidden-state or nonstationary emissions.
+    source: src/active_inference_power/sequential.py:bernoulli_confidence_sequence
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/results.json
+  - claim_id: e-lond-accounting-boundary
+    kind: validity_boundary
+    evidence_class: formal_conditional
+    value: predictable_e_value_levels_reciprocal_rejection_rule_and_cumulative_nominal_level_allocation_trace
+    non_claim: E-value online-FDR validity still requires the declared conditional calibration and arrival filtration assumptions; the cumulative allocation is not alpha-wealth or a remaining budget.
+    source: src/active_inference_power/online_fdr.py:e_lond
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/results.json
+  - claim_id: learned-policy-held-out-evaluation
+    kind: empirical_operating_characteristic
+    evidence_class: conditional_operating_characteristic
+    value: frozen_policy_evaluated_on_independent_child_streams
+    non_claim: Held-out policy results are not optimality, utility, causal, or universal active-inference claims.
+    source: src/active_inference_power/learned_policy.py:evaluate_learned_policy
+    source_tier: generated_metric
+    freshness: generated
+    artifact_path: output/action_loop_suite.json
+  - claim_id: learned-policy-complexity-accounting
+    kind: computation_policy
+    evidence_class: conditional_operating_characteristic
+    value: frozen_policy_hash_and_search_configuration_hash_with_candidate_count_and_parameter_dimension
+    non_claim: Search-space provenance does not establish optimality, generalization beyond the held-out scenario, or family-level validity.
+    source: src/active_inference_power/learned_policy.py:LearnedPolicyConfig,LearnedPolicyArtifact
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/action_loop_suite.json
+  - claim_id: computational-workload-accounting
+    kind: computation_policy
+    evidence_class: provenance_contract
+    value: deterministic_source_work_proxies_and_declared_action_trace_step_accounting
+    non_claim: Source-work accounting does not establish processor-instruction counts, elapsed time, peak memory, cross-hardware performance, statistical validity, or a policy ranking.
+    source: src/active_inference_power/computational_complexity.py:build_computational_complexity
+    source_tier: generated_metric
+    freshness: generated
+    artifact_path: output/results.json
+  - claim_id: conservative-adaptive-fdr-diagnostic
+    kind: validity_boundary
+    evidence_class: calibration_diagnostic
+    value: fixed_lambda_binomial_upper_confidence_bound_on_null_count
+    non_claim: Applying the same-vector bound to rejection decisions is not a finite-sample FDR theorem under arbitrary dependence, data-adaptive lambda, or misspecified p-values.
+    source: src/active_inference_power/corrections.py:storey_qvalue_conservative
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/results.json
+  - claim_id: imported-two-sided-non-prds-protocol
+    kind: empirical_stress_test
+    evidence_class: stress_test
+    value: checksum_pinned_offline_adapter_for_publicly_documented_dobriban_bh_finite_protocol
+    non_claim: Local finite Monte Carlo does not reproduce the external outward-rounded Arb theorem or establish arbitrary-dependence behavior.
+    source: src/active_inference_power/protocols/dobriban_bh.py:run_dobriban_bh_chunk
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/results.json
+    citation: dobriban2026bh
+  - claim_id: split-stream-storey-review
+    kind: validity_boundary
+    evidence_class: calibration_diagnostic
+    value: fixed_lambda_selection_only_null_count_and_independent_confirmation
+    non_claim: The finite calibration certificate is not a universal Storey FDR theorem and does not validate same-stream or arbitrary adaptive selection.
+    source: src/active_inference_power/certificates.py:certify_storey_split_confirmation
+    source_tier: generated_metric
+    freshness: generated
+    artifact_path: output/certificates.json
+  - claim_id: sequential-design-scholarship
+    kind: citation
+    value: chernoff1959sequential
+    source: manuscript/references.bib:chernoff1959sequential
+    source_tier: bibliography
+    freshness: active
+    artifact_path: manuscript/references.bib
+  - claim_id: information-guided-experiment-scholarship
+    kind: citation
+    value: lindley1956information
+    source: manuscript/references.bib:lindley1956information
+    source_tier: bibliography
+    freshness: active
+    artifact_path: manuscript/references.bib
+  - claim_id: sequential-error-budget-scholarship
+    kind: citation
+    value: foster2008alpha_investing
+    source: manuscript/references.bib:foster2008alpha_investing
+    source_tier: bibliography
+    freshness: active
+    artifact_path: manuscript/references.bib
+  - claim_id: sequential-selection-scholarship
+    kind: citation
+    value: gsell2016sequential
+    source: manuscript/references.bib:gsell2016sequential
+    source_tier: bibliography
+    freshness: active
+    artifact_path: manuscript/references.bib
+  - claim_id: adaptive-allocation-testing-scholarship
+    kind: citation
+    value: yang2017bandit_testing
+    source: manuscript/references.bib:yang2017bandit_testing
+    source_tier: bibliography
+    freshness: active
+    artifact_path: manuscript/references.bib
+  - claim_id: simulation-reporting-scholarship
+    kind: citation
+    value: morris2019simulation
+    source: manuscript/references.bib:morris2019simulation
+    source_tier: bibliography
+    freshness: active
+    artifact_path: manuscript/references.bib
+  - claim_id: local-runtime-measurement-scholarship
+    kind: citation
+    value: georges2007rigorous
+    source: manuscript/references.bib:georges2007rigorous
+    source_tier: bibliography
+    freshness: active
+    artifact_path: manuscript/references.bib
+  - claim_id: reproducible-computation-scholarship
+    kind: citation
+    value: sandve2013ten_rules
+    source: manuscript/references.bib:sandve2013ten_rules
+    source_tier: bibliography
+    freshness: active
+    artifact_path: manuscript/references.bib
+  - claim_id: testing-setting-contract-visualization
+    kind: provenance_contract
+    value: configuration_derived_hypothesis_evidence_accounting_stopping_cost_and_validity_map
+    source: src/active_inference_power/figures/__init__.py:_testing_setting_contract
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/figures/figure_registry.json
+  - claim_id: testing-setting-sensitivity-surface
+    kind: empirical_operating_characteristic
+    evidence_class: conditional_operating_characteristic
+    value: factorial_alpha_horizon_budget_interface_and_correction_surface_with_within_cell_common_random_numbers
+    non_claim: Separate finite-simulation metrics do not provide a pooled utility score, universal policy ranking, or theorem outside the declared setting.
+    source: src/active_inference_power/testing_setting_sensitivity.py:evaluate_testing_setting_sensitivity
+    source_tier: generated_metric
+    freshness: generated
+    artifact_path: output/research-atlas/research_atlas.json
+  - claim_id: stratified-split-stream-calibration-sensitivity
+    kind: empirical_stress_test
+    evidence_class: calibration_diagnostic
+    value: target_and_visible_history_stratified_all_null_confirmation_pvalue_diagnostics_over_fixed_selection_step_sensitivity
+    non_claim: A finite DKW or empirical-CDF calibration result does not prove selective-inference validity or validate same-stream selection and misspecified processes.
+    source: src/active_inference_power/selection_sensitivity.py:evaluate_split_stream_sensitivity
+    source_tier: generated_metric
+    freshness: generated
+    artifact_path: output/research-atlas/research_atlas.json
+  - claim_id: paired-dynamic-process-sensitivity
+    kind: empirical_stress_test
+    evidence_class: stress_test
+    value: paired_static_controls_for_context_persistence_reliability_drift_action_transitions_and_missingness_regimes
+    non_claim: Dynamic-process stress results are not a formal dynamic-process law, optional-stopping guarantee, or universal robustness claim.
+    source: src/active_inference_power/dynamic_process_sensitivity.py:evaluate_dynamic_process_sensitivity
+    source_tier: generated_metric
+    freshness: generated
+    artifact_path: output/research-atlas/research_atlas.json
+  - claim_id: sequential-evidence-comparison-atlas
+    kind: empirical_comparison
+    evidence_class: calibration_diagnostic
+    value: shared_stream_comparison_of_simple_mixture_and_predictable_e_processes_with_confidence_sequence_and_e_lond_diagnostics
+    non_claim: Finite crossing, coverage, and accounting estimates do not prove Ville, confidence-sequence, predictable-evidence, or online-FDR theorems outside their assumptions.
+    source: src/active_inference_power/sequential_atlas.py:evaluate_sequential_evidence_atlas
+    source_tier: generated_metric
+    freshness: generated
+    artifact_path: output/research-atlas/research_atlas.json
+  - claim_id: repeated-held-out-policy-partitions
+    kind: empirical_operating_characteristic
+    evidence_class: conditional_operating_characteristic
+    value: repeated_disjoint_train_freeze_evaluate_partitions_with_partition_level_paired_held_out_power_cost_and_stopping_bands
+    non_claim: Repeated held-out policy comparisons do not establish optimality, universal benefit, causal effects, or family-level validity.
+    source: src/active_inference_power/repeated_policy_evaluation.py:evaluate_repeated_learned_policy
+    source_tier: generated_metric
+    freshness: generated
+    artifact_path: output/research-atlas/research_atlas.json
+  - claim_id: multi-target-arrival-environment-contract
+    kind: empirical_stress_test
+    evidence_class: stress_test
+    value: versioned_multi_target_arrival_action_dependent_sensing_and_independent_confirmation_with_paired_static_control
+    non_claim: The multi-target environment contract is not a formal filtration proof, universal adaptive-confirmation guarantee, or expanded active-inference claim.
+    source: src/active_inference_power/multi_target_environment.py:evaluate_multi_target_control_pair
+    source_tier: generated_metric
+    freshness: generated
+    artifact_path: output/research-atlas/research_atlas.json
+  - claim_id: certificate-gate-policy-partition
+    kind: provenance_contract
+    value: exact_terminal_and_diagnostic_partition_with_all_verdicts_serialized_and_hash_bound
+    non_claim: A diagnostic classification does not erase a failed certificate, prove validity, or authorize promotion outside its declared lane.
+    source: src/active_inference_power/certificate_gate.py:certificate_gate_result
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/campaign-v2/results.json
+  - claim_id: frozen-three-way-storey-method-review
+    kind: empirical_comparison
+    evidence_class: calibration_diagnostic
+    value: frozen_independent_two_groups_comparison_of_same_vector_storey_plugin_conservative_same_vector_and_independent_split_confirmation_storey_rules
+    non_claim: Finite Monte-Carlo bands under the declared independent model do not prove arbitrary-dependence FDR control, change a certificate policy, or create a release claim.
+    source: src/active_inference_power/storey_method_review.py:evaluate_storey_method_review
+    source_tier: generated_metric
+    freshness: generated
+    artifact_path: output/storey-method-review/storey_method_review.json
+  - claim_id: offline-benchmark-preflight-provenance
+    kind: provenance_contract
+    value: offline_checksum_pinned_golub_lineage_and_chronological_trajectory_preflight_with_missingness_report
+    non_claim: Benchmark provenance, preprocessing lineage, and leakage checks do not establish biological ground truth, external validity, or a synthetic theorem.
+    source: src/active_inference_power/benchmark_preflight.py:preflight_offline_benchmark_fixtures
+    source_tier: project_source
+    freshness: active
+    artifact_path: output/benchmark_preflight/provenance_dashboard.json
