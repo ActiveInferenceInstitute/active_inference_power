@@ -22,6 +22,7 @@ Required source/test gates:
 ./.venv/bin/ruff check src scripts tests examples
 ./.venv/bin/python -m pytest tests/ --cov=active_inference_power --cov-branch --cov-fail-under=95
 env -u VIRTUAL_ENV uv run mypy src scripts tests examples --ignore-missing-imports
+./.venv/bin/python scripts/validate_gnn_specs.py
 ```
 
 For a release candidate, pass the same new `--output-root` to result generation,

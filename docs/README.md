@@ -31,6 +31,7 @@
 | [evaluation_perspective.md](evaluation_perspective.md) | Investigator, simulated-agent, and task-environment role boundary |
 | [testing_philosophy.md](testing_philosophy.md) | No-mock and coverage policy |
 | [action_in_the_loop.md](action_in_the_loop.md) | Model/process/setting and policy execution contracts |
+| [../models/README.md](../models/README.md) | GNN specifications for the declared generative models and the upstream custody pin |
 | [formalism_to_code.md](formalism_to_code.md) | Executable formalism and source-symbol traceability |
 | [claim_audit.md](claim_audit.md) | Claim/evidence/non-claim ledger review |
 | [scholarship_map.md](scholarship_map.md) | Literature roles, implementation status, and evidence boundaries |
