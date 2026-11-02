@@ -7,7 +7,11 @@ import json
 from pathlib import Path
 import subprocess
 import sys
-import tomllib
+
+try:  # Python 3.11+ ships `tomllib`; the dev extra declares `tomli` for the floor.
+    import tomllib
+except ModuleNotFoundError:  # pragma: no cover - executed only on Python 3.10
+    import tomli as tomllib
 
 import pytest
 import yaml
