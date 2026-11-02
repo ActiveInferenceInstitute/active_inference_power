@@ -335,6 +335,7 @@ def test_spec_paths_is_sorted_and_complete() -> None:
     "text, message",
     [
         ("## GNNSection\n\nS\n", "missing required section"),
+        ("no section headers at all\n", "missing required section"),
         (
             "## GNNSection\n\nS\n\n## GNNVersionAndFlags\n\nGNN v1.1\n\n## ModelName\n\nM\n\n"
             "## StateSpaceBlock\n\nA[2,2,type=float]\n\n## Connections\n\nbroken edge line\n",
@@ -342,7 +343,18 @@ def test_spec_paths_is_sorted_and_complete() -> None:
         ),
         (
             "## GNNSection\n\nS\n\n## GNNVersionAndFlags\n\nGNN v1.1\n\n## ModelName\n\nM\n\n"
+            "## StateSpaceBlock\n\nnot a declaration\n\n## Connections\n\nA>A\n",
+            "malformed StateSpaceBlock",
+        ),
+        (
+            "## GNNSection\n\nS\n\n## GNNVersionAndFlags\n\nGNN v1.1\n\n## ModelName\n\nM\n\n"
             "## StateSpaceBlock\n\nA[2,type=float,default=uniform]\n\n## Connections\n\nA>A\n",
+            None,
+        ),
+        (
+            "## GNNSection\n\nS\n\n## GNNVersionAndFlags\n\nGNN v1.1\n\n## ModelName\n\nM\n\n"
+            "## StateSpaceBlock\n\nA[2,,type=float]\n\n## Connections\n\n# comment\nA>A\n\nA-A\n\n"
+            "## ModelParameters\n\nnum_states: 2\n# comment\nnot-a-pair\n",
             None,
         ),
         (
@@ -475,6 +487,40 @@ def test_digest_normalization_and_divergence_controls() -> None:
     assert digest_divergences(digest, {**digest, "ontology": {}})
     assert digest_divergences(digest, {**digest, "variables": {}})
     assert digest_divergences(digest, {**digest, "time": "Dynamic"})
+    assert any(
+        "declared upstream only" in issue
+        for issue in digest_divergences({**digest, "variables": {}}, digest)
+    )
+    assert any(
+        "variables['A']" in issue
+        for issue in digest_divergences(
+            digest, {**digest, "variables": {"A": {"dims": [2, 2], "dtype": "int"}}}
+        )
+    )
+    assert any(
+        "connections differ" in issue
+        for issue in digest_divergences(
+            digest, {**digest, "connections": [["A", "C", "DIRECTED", ""]]}
+        )
+    )
+    assert any(
+        "present upstream only" in issue
+        for issue in digest_divergences(
+            digest, {**digest, "parameters": {"A": [[0.5], [0.5]], "extra": [1.0]}}
+        )
+    )
+    assert any(
+        "present in the project parser only" in issue
+        for issue in digest_divergences(
+            {**digest, "parameters": {"A": [[0.5], [0.5]], "extra": [1.0]}}, digest
+        )
+    )
+    assert any(
+        "parameters['A']" in issue
+        for issue in digest_divergences(digest, {**digest, "parameters": {"A": [[0.5]]}})
+    )
+    assert normalize_upstream_digest({**payload, "time": "static"})["time"] == "Static"
+    assert normalize_upstream_digest({**payload, "time": "unmarked"})["time"] == "Static"
     with pytest.raises(UpstreamPinError, match="must be a mapping"):
         digest_divergences({"variables": []}, {})
     with pytest.raises(UpstreamPinError, match="missing fields"):

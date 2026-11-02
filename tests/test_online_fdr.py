@@ -2,10 +2,19 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 import pytest
 
-from active_inference_power.online_fdr import _gamma_at, default_gamma, e_lond, lord_plus_plus, saffron
+from active_inference_power.online_fdr import (
+    OnlineFDRResult,
+    _gamma_at,
+    default_gamma,
+    e_lond,
+    lord_plus_plus,
+    saffron,
+)
 
 
 def test_gamma_is_positive_and_normalized() -> None:
@@ -124,3 +133,25 @@ def test_e_lond_recycled_levels_are_not_a_remaining_budget() -> None:
     assert result.cumulative_allocations[-1] > result.alpha
     with pytest.raises(ValueError):
         e_lond([1.0], gamma=[0.0])
+
+
+def test_online_fdr_result_rejects_inconsistent_trace_fields() -> None:
+    """Direct trace construction re-checks the wealth seed and the SAFFRON lambda."""
+    real = lord_plus_plus([0.1, 0.2])
+    fields: dict[str, Any] = {
+        "method": real.method,
+        "pvalues": real.pvalues,
+        "levels": real.levels,
+        "candidates": real.candidates,
+        "rejections": real.rejections,
+        "wealth": real.wealth,
+        "alpha": real.alpha,
+        "gamma": real.gamma,
+        "lambda_": real.lambda_,
+        "initial_wealth": real.initial_wealth,
+    }
+    assert OnlineFDRResult(**fields).wealth[0] == pytest.approx(real.initial_wealth)
+    with pytest.raises(ValueError, match=r"wealth\[0\] must equal initial_wealth"):
+        OnlineFDRResult(**{**fields, "wealth": np.array([0.0, *real.wealth[1:]])})
+    with pytest.raises(ValueError, match="lambda_ must lie"):
+        OnlineFDRResult(**{**fields, "method": "saffron", "lambda_": 1.5})

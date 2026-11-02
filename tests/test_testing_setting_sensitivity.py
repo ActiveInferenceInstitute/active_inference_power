@@ -259,3 +259,10 @@ def test_internal_action_and_evaluation_boundaries_fail_closed() -> None:
     object.__setattr__(plan, "evidence_interfaces", ("unknown",))
     with pytest.raises(RuntimeError, match="unrecognized evidence interface"):
         evaluate_testing_setting_sensitivity(plan)
+
+
+def test_plan_rejects_non_canonical_string_entries() -> None:
+    """Frozen construction fails closed on non-string grid entries."""
+    for field in ("evidence_interfaces", "fixed_family_corrections", "action_policies"):
+        with pytest.raises(ValueError, match="canonical strings"):
+            _small_plan(**{field: (1,)})

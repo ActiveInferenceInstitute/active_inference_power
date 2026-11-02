@@ -13,6 +13,7 @@ from scipy.stats import false_discovery_control
 
 from active_inference_power.theory import (
     bh_fdr_bound,
+    bh_fdr_bound_from_counts,
     bh_global_null_fdr,
     bh_threshold,
     bonferroni_fwer_bound,
@@ -444,3 +445,13 @@ class TestIsMonotoneStepUp:
     def test_bad_pvalues_raise(self) -> None:
         with pytest.raises(ValueError):
             is_monotone_step_up(np.array([0.1, 1.7]), np.array([True, False]))
+
+
+def test_bh_fdr_bound_from_counts_validates_realized_counts() -> None:
+    """The finite-family helper fails closed on non-count arguments."""
+    assert bh_fdr_bound_from_counts(2, 4, 0.05) == pytest.approx(0.025)
+    assert bh_fdr_bound_from_counts(0, 4, 0.05) == 0.0
+    with pytest.raises(ValueError, match="m must be a positive integer"):
+        bh_fdr_bound_from_counts(0, 0, 0.05)
+    with pytest.raises(ValueError, match=r"m0 must be an integer in \[0, m\]"):
+        bh_fdr_bound_from_counts(5, 4, 0.05)

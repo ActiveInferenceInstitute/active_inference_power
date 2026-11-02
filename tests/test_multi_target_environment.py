@@ -42,6 +42,7 @@ def test_multi_target_spec_is_versioned_and_validates_visible_contract() -> None
         ({"target_ids": ("a", "b")}, "at least three"),
         ({"target_ids": ("a", "a", "c")}, "unique"),
         ({"arrival_times": (0, 1)}, "align"),
+        ({"arrival_times": (-1, 1, 2)}, "non-negative"),
         ({"arrival_times": (0, 1, 4)}, "before horizon"),
         ({"reliability_schedule": (0.7,) * 3}, "align"),
         ({"reliability_schedule": (0.5,) * 4}, "reliability"),
