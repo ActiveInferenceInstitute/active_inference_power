@@ -8,9 +8,9 @@ from pathlib import Path
 import subprocess
 import sys
 
-try:  # Python 3.11+ ships `tomllib`; the dev extra declares `tomli` for the floor.
+if sys.version_info >= (3, 11):  # Python 3.11+ ships `tomllib`.
     import tomllib
-except ModuleNotFoundError:  # pragma: no cover - executed only on Python 3.10
+else:  # pragma: no cover - executed only on Python 3.10
     import tomli as tomllib
 
 import pytest
