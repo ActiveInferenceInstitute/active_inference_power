@@ -16,5 +16,7 @@
   `./.venv/bin/python scripts/validate_gnn_specs.py` and
   `./.venv/bin/python -m pytest tests/test_gnn_specs.py`; the second check also
   exercises the pinned upstream parser when the sibling checkout is present.
-- A pin bump is a deliberate act: update `gnn-pin.json` (tag + full commit) and
-  re-run both checks.
+- A pin bump is a deliberate act: update `gnn-pin.json` with the new exact
+  commit, the upstream `version` from that revision's `pyproject.toml`, and the
+  `date_recorded`, keep `tag` when the release is tagged, then re-run both
+  checks.

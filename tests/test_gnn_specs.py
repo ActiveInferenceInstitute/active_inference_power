@@ -118,14 +118,15 @@ def upstream_run(tmp_path_factory: pytest.TempPathFactory) -> UpstreamRun:
 
     spec_files = [str(path.resolve()) for path in SHIPPED_SPECS] + [str(mutant)]
     env = {**os.environ, "PYTHONPATH": str(extract_dir / "src")}
+    parser_module, parser_class = pin.parser_entry_point()
     command = [
         str(gnn_checkout_python(root)),
         "-c",
         DIGEST_DRIVER_SOURCE,
         "--module",
-        pin.parser_module,
+        parser_module,
         "--class-name",
-        pin.parser_class,
+        parser_class,
     ]
     for spec in spec_files:
         command += ["--spec", spec]
@@ -145,17 +146,31 @@ def test_pin_file_names_the_canonical_release() -> None:
     pin = load_upstream_pin(PIN_PATH)
     assert pin.tag == CANONICAL_TAG
     assert pin.commit == CANONICAL_COMMIT
-    assert pin.parser_module == "gnn.parsers.markdown_parser"
-    assert pin.parser_class == "MarkdownGNNParser"
+    assert pin.version == "5.0.3"
+    assert pin.date_recorded == "2026-11-01"
+    assert pin.parser_entry_point() == ("gnn.parsers.markdown_parser", "MarkdownGNNParser")
 
 
 @pytest.mark.parametrize(
     "mutate, message",
     [
-        (lambda data: {k: v for k, v in data.items() if k != "commit"}, "must declare exactly"),
-        (lambda data: {**data, "extra": "x"}, "must declare exactly"),
+        (
+            lambda data: {k: v for k, v in data.items() if k != "commit"},
+            "complete Git object identity|must declare",
+        ),
+        (
+            lambda data: {k: v for k, v in data.items() if k != "version"},
+            "must declare",
+        ),
+        (
+            lambda data: {k: v for k, v in data.items() if k != "date_recorded"},
+            "must declare",
+        ),
         (lambda data: {**data, "repository": "git@github.com:x/y.git"}, "HTTPS GitHub URL"),
         (lambda data: {**data, "tag": "5.0.3"}, "stable version"),
+        (lambda data: {**data, "tag": "v5.0.4"}, "same release"),
+        (lambda data: {**data, "version": "5.0"}, "release version"),
+        (lambda data: {**data, "date_recorded": "2026-13-01"}, "ISO date"),
         (lambda data: {**data, "commit": "abc123"}, "complete Git object identity"),
         (lambda data: {**data, "parser_module": "markdown_parser"}, "dotted import path"),
         (lambda data: {**data, "parser_class": "not a class"}, "Python identifier"),
@@ -169,6 +184,23 @@ def test_pin_loader_rejects_malformed_pins(tmp_path: Path, mutate: Any, message:
     broken.write_text(json.dumps(mutate(data)), encoding="utf-8")
     with pytest.raises(UpstreamPinError, match=message):
         load_upstream_pin(broken)
+
+
+def test_pin_loader_keeps_extra_fields_and_accepts_a_tagless_core(tmp_path: Path) -> None:
+    """Extra keys live in ``extras``; the parser entry point is optional."""
+    data = json.loads(PIN_PATH.read_text(encoding="utf-8"))
+    minimal = {
+        key: data[key] for key in ("repository", "commit", "version", "date_recorded")
+    }
+    minimal["digest_map"] = {"specs": 2}
+    path = tmp_path / "gnn-pin.json"
+    path.write_text(json.dumps(minimal), encoding="utf-8")
+    pin = load_upstream_pin(path)
+    assert pin.tag is None
+    assert pin.parser_module is None
+    assert pin.extras == {"digest_map": {"specs": 2}}
+    with pytest.raises(UpstreamPinError, match="parser entry point"):
+        pin.parser_entry_point()
 
 
 def test_pin_loader_rejects_duplicate_and_missing_files(tmp_path: Path) -> None:
@@ -206,8 +238,9 @@ def test_shipped_specs_parse_and_bind_to_the_runtime_models() -> None:
     assert report["passed"] is True
     assert report["pin"] == {
         "repository": "https://github.com/ActiveInferenceInstitute/Generalized_Notation_Notation",
-        "tag": CANONICAL_TAG,
         "commit": CANONICAL_COMMIT,
+        "version": "5.0.3",
+        "date_recorded": "2026-11-01",
     }
     rows = {str(row["runtime_model"]): row for row in cast(list[dict[str, Any]], report["specs"])}
     assert set(rows) == {"reference_action_loop", "sequential_evidence_agent"}
@@ -464,8 +497,9 @@ def test_digest_normalization_and_divergence_controls() -> None:
 def test_upstream_parser_ran_from_the_pinned_commit(upstream_run: UpstreamRun) -> None:
     """The executed parser module is the extracted pinned release, not the live tree."""
     parser_info = upstream_run.payload["parser"]
-    assert parser_info["module"] == upstream_run.pin.parser_module
-    assert parser_info["class"] == upstream_run.pin.parser_class
+    parser_module, parser_class = upstream_run.pin.parser_entry_point()
+    assert parser_info["module"] == parser_module
+    assert parser_info["class"] == parser_class
     assert Path(parser_info["file"]).resolve().is_relative_to(upstream_run.extract_dir.resolve())
     assert parser_info["gnn_version"] == "5.0.3"
 
