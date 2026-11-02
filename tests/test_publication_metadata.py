@@ -7,11 +7,7 @@ import json
 from pathlib import Path
 import subprocess
 import sys
-
-if sys.version_info >= (3, 11):  # Python 3.11+ ships `tomllib`.
-    import tomllib
-else:  # pragma: no cover - executed only on Python 3.10
-    import tomli as tomllib
+import tomllib
 
 import pytest
 import yaml
