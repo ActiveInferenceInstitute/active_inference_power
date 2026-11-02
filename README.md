@@ -202,6 +202,9 @@ the
 [framework integration guide](https://github.com/ActiveInferenceInstitute/Generalized_Notation_Notation/blob/main/docs/gnn/integration/framework_integration_guide.md)
 covers the render/execute pipeline for a project that wants to run a
 specification through the upstream tooling rather than a project reader.
+GNN maintains a
+[downstream adoption guide](https://github.com/ActiveInferenceInstitute/Generalized_Notation_Notation/blob/main/docs/gnn/integration/downstream_adoption.md)
+for repositories that consume the notation.
 
 Related fleet projects: [`policy_entanglement`](https://github.com/ActiveInferenceInstitute/policy_entanglement)
 (policy-level generative models with a GNN round-trip and a Lean boundary
