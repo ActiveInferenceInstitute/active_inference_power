@@ -95,6 +95,21 @@ def _hydration_pending(
     return pending
 
 
+def _requires_ledger_artifacts(
+    *, allow_draft: bool, output_is_default: bool, complete_before_hydration: bool
+) -> bool:
+    """Whether hydration must prove every active claim-ledger target exists.
+
+    The cross-root requirement fits a complete default tree, which carries the
+    campaign, research-atlas, and benchmark-preflight receipts the ledger names.
+    A source-bound fast or partial bundle in a clean checkout cannot carry
+    receipts from other output roots; its manifest is the authoritative
+    artifact set. Completion authority is invalidated before the ledger check
+    either way, so the relaxed path cannot promote an incomplete bundle.
+    """
+    return not allow_draft and output_is_default and complete_before_hydration
+
+
 def _write_local_resolved_manuscript_tree(
     project_root: Path, output: Path, variables: dict[str, str]
 ) -> None:
@@ -214,6 +229,9 @@ def main() -> int:
             )
     elif not args.allow_draft:
         raise FileNotFoundError(manifest_path)
+    complete_before_hydration = bool(
+        isinstance(manifest, dict) and manifest.get("complete") is True
+    )
     if manifest is not None:
         # Persist the loss of completion authority before touching variables or
         # renderer input. A crash can then leave only a clearly incomplete
@@ -236,10 +254,15 @@ def main() -> int:
         validate_claim_ledger(
             yaml.safe_load(claim_ledger_path.read_text(encoding="utf-8")),
             project_root=_PROJECT_ROOT,
-            # The default output tree can validate every active ledger target.
-            # An isolated review root may intentionally contain only the
-            # current run; its manifest is the authoritative artifact set.
-            require_artifacts=not args.allow_draft and output == (_PROJECT_ROOT / "output").resolve(),
+            # A complete default tree can validate every active ledger target.
+            # A source-bound fast or partial bundle, or an isolated review root,
+            # may intentionally contain only the current run; its manifest is
+            # the authoritative artifact set.
+            require_artifacts=_requires_ledger_artifacts(
+                allow_draft=args.allow_draft,
+                output_is_default=output == (_PROJECT_ROOT / "output").resolve(),
+                complete_before_hydration=complete_before_hydration,
+            ),
             artifact_root=output,
         )
 

@@ -94,7 +94,10 @@ Scripts are thin command-line orchestrators:
   does not replace the all-chunk stress-bundle receipt or external certificate;
 - `z_generate_manuscript_variables.py` performs strict manuscript hydration;
   pass the same `--output-root` used by the result and quality stages when
-  working in an isolated bundle.
+  working in an isolated bundle. The cross-root claim-ledger artifact check is
+  scoped to a complete default `output/` tree; a source-bound fast or partial
+  bundle is validated against its own manifest, so a clean checkout can hydrate
+  without the campaign, research-atlas, and benchmark-preflight receipts.
 
 Keep statistical logic in `src/active_inference_power/` so it can be imported
 and tested independently. Support modules such as `artifacts.py`,
