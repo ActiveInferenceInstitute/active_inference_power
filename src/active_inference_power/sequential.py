@@ -344,7 +344,7 @@ def mixture_e_process(
     if np.any((rates <= 0.0) | (rates >= 1.0)) or np.any(rates == q0):
         raise ValueError("alternative_rates must lie in (0, 1) and differ from null_rate")
     if weights is None:
-        prior = np.full(rates.size, 1.0 / rates.size)
+        prior: np.ndarray = np.full(rates.size, 1.0 / rates.size)
     else:
         prior = np.asarray(weights, dtype=float)
         if prior.shape != rates.shape or not np.all(np.isfinite(prior)) or np.any(prior < 0.0):

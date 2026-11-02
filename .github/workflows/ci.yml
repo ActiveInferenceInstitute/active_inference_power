@@ -21,7 +21,7 @@ jobs:
       - run: uv sync --locked --extra dev
       - run: uv run python -m compileall -q src scripts tests examples
       - run: uv run ruff check src scripts tests examples
-      - run: uv run mypy src scripts tests examples --ignore-missing-imports
+      - run: uv run --extra dev mypy src scripts tests examples --ignore-missing-imports
       - run: uv run python scripts/validate_gnn_specs.py
       - run: uv run python -m pytest tests/ --cov=active_inference_power --cov-branch --cov-fail-under=95 -q
       - run: uv build --out-dir /tmp/active-inference-power-wheel

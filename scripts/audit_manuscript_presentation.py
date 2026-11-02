@@ -21,6 +21,9 @@ from typing import Final, TypedDict
 
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
+# ``re.NOFLAG`` is Python 3.11+; the project supports 3.10 (``requires-python``),
+# where the same "no flags" value is ``re.RegexFlag(0)``.
+_NO_FLAGS: Final[re.RegexFlag] = getattr(re, "NOFLAG", re.RegexFlag(0))
 _SOURCE_EXCLUSIONS: Final[frozenset[str]] = frozenset(
     {"AGENTS.md", "README.md", "SYNTAX.md", "preamble.md"}
 )
@@ -394,7 +397,7 @@ def _blank_preserving_newlines(value: str) -> str:
     return re.sub(r"[^\n]", " ", value)
 
 
-def _mask(text: str, pattern: str, *, flags: re.RegexFlag = re.NOFLAG) -> str:
+def _mask(text: str, pattern: str, *, flags: re.RegexFlag = _NO_FLAGS) -> str:
     return re.sub(
         pattern,
         lambda match: _blank_preserving_newlines(match.group(0)),
@@ -519,16 +522,16 @@ def _numeric_mask(text: str) -> str:
         (r"\\begin\{[^}\n]+\}.*?\\end\{[^}\n]+\}", re.DOTALL),
         (r"\\\(.*?\\\)", re.DOTALL),
         (r"\$\$.*?\$\$", re.DOTALL),
-        (r"(?<!\\)\$(?!\$)(?:\\.|[^$\n])*?(?<!\\)\$", re.NOFLAG),
-        (r"\[[^\]\n]*@[^\]\n]*\]", re.NOFLAG),
-        (r"@[A-Za-z][A-Za-z0-9_:-]*", re.NOFLAG),
-        (r"\]\([^\)\n]*\)", re.NOFLAG),
-        (r"\{(?:#|\.)[^}\n]*\}", re.NOFLAG),
-        (r"\{\{[^}\n]*\}\}", re.NOFLAG),
+        (r"(?<!\\)\$(?!\$)(?:\\.|[^$\n])*?(?<!\\)\$", _NO_FLAGS),
+        (r"\[[^\]\n]*@[^\]\n]*\]", _NO_FLAGS),
+        (r"@[A-Za-z][A-Za-z0-9_:-]*", _NO_FLAGS),
+        (r"\]\([^\)\n]*\)", _NO_FLAGS),
+        (r"\{(?:#|\.)[^}\n]*\}", _NO_FLAGS),
+        (r"\{\{[^}\n]*\}\}", _NO_FLAGS),
         (r"\b(?:width|height)=[^\s}\]]+", re.IGNORECASE),
         (r"\bSHA-\d+\b", re.IGNORECASE),
-        (r"(?m)^\s*\d+[.)]\s+", re.NOFLAG),
-        (r"(?m)^#{1,6}\s+S\d+(?=[.\s])", re.NOFLAG),
+        (r"(?m)^\s*\d+[.)]\s+", _NO_FLAGS),
+        (r"(?m)^#{1,6}\s+S\d+(?=[.\s])", _NO_FLAGS),
     ):
         masked = _mask(masked, pattern, flags=flags)
     return masked
