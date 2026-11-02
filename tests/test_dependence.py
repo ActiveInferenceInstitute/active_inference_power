@@ -91,3 +91,16 @@ def test_factor_sampling_applies_valid_and_invalid_means() -> None:
     assert draw.shape == (3,)
     with pytest.raises(ValueError):
         sample_gaussian(np.random.default_rng(4), 3, config, mean=np.zeros(2))
+
+
+def test_block_layout_and_mean_free_factor_sampling() -> None:
+    """Declared block size controls real off-block zeros; factor draws need no mean."""
+    matrix = correlation_matrix(4, DependenceConfig(kind="block", rho=0.4, block_size=2))
+    assert np.allclose(np.diag(matrix), 1.0)
+    assert np.allclose(matrix[:2, :2], [[1.0, 0.4], [0.4, 1.0]])
+    assert np.allclose(matrix[:2, 2:], 0.0)
+    factor_config = DependenceConfig(kind="factor", loadings=np.array([0.2, -0.1, 0.3]))
+    draw = sample_gaussian(np.random.default_rng(5), 3, factor_config)
+    assert draw.shape == (3,)
+    with pytest.raises(ValueError, match="block_size=1"):
+        correlation_matrix(3, DependenceConfig(kind="block", rho=0.3, block_size=1))

@@ -95,6 +95,7 @@ Validate source changes with:
 ./.venv/bin/ruff check src scripts tests examples
 ./.venv/bin/python -m pytest tests/ --cov=active_inference_power --cov-branch --cov-fail-under=95
 env -u VIRTUAL_ENV uv run mypy src scripts tests examples --ignore-missing-imports
+./.venv/bin/python scripts/validate_gnn_specs.py
 ```
 
 At the selected output root, analysis writes `results.json`, `certificates.json`,
@@ -179,6 +180,34 @@ symbol, test, and boundary cross-reference.
 The public API is re-exported from `src/active_inference_power/__init__.py`, so `import active_inference_power` works
 without test-specific path manipulation. See
 [`docs/PACKAGE_CONTRACT.md`](docs/PACKAGE_CONTRACT.md) for invariants.
+
+## Generative-model specifications
+
+The agent-side generative models are specified in
+[Generalized Notation Notation](https://github.com/ActiveInferenceInstitute/Generalized_Notation_Notation)
+(GNN v1.1) under [`models/`](models/README.md): the sequential
+evidence-calibration agent and the two-target action-loop reference model.
+Numeric values stay owned by the runtime contracts; the specifications declare
+the structure and are checked against the real runtime model by
+[`scripts/validate_gnn_specs.py`](scripts/validate_gnn_specs.py). The custody
+pin [`models/gnn-pin.json`](models/gnn-pin.json) records the canonical upstream
+release (v5.0.3), and `tests/test_gnn_specs.py` additionally requires digest
+equality with the pinned upstream parser when the sibling
+`Generalized_Notation_Notation` checkout is available. Model authoring starts
+from the GNN
+[template library](https://github.com/ActiveInferenceInstitute/Generalized_Notation_Notation/blob/main/docs/templates/README.md)
+and
+[syntax reference](https://github.com/ActiveInferenceInstitute/Generalized_Notation_Notation/blob/main/docs/gnn/reference/gnn_syntax.md);
+the
+[framework integration guide](https://github.com/ActiveInferenceInstitute/Generalized_Notation_Notation/blob/main/docs/gnn/integration/framework_integration_guide.md)
+covers the render/execute pipeline for a project that wants to run a
+specification through the upstream tooling rather than a project reader.
+
+Related fleet projects: [`policy_entanglement`](https://github.com/ActiveInferenceInstitute/policy_entanglement)
+(policy-level generative models with a GNN round-trip and a Lean boundary
+fragment) and [`on_policy_distillation`](https://github.com/ActiveInferenceInstitute/on_policy_distillation)
+(a sheaf-composed pymdp/active-inference exemplar with GNN model
+specifications).
 
 ## Rendering
 

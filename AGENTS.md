@@ -55,6 +55,7 @@ Read the closest applicable guide in addition to this root contract:
 | `src/AGENTS.md` | Deterministic domain logic, canonical serialization, and validation boundaries |
 | `tests/AGENTS.md` | Real-fixture testing, deterministic seeds, and fail-closed coverage |
 | `examples/AGENTS.md` | Offline public-API demonstrations and non-promotional outputs |
+| `models/AGENTS.md` | GNN specifications for the declared generative models and the upstream custody pin |
 | `manuscript/AGENTS.md` | Source templates, variables, figures, and render order |
 | `manuscript/assets/AGENTS.md` | Authored source art and cover-asset provenance |
 | `.agents/AGENTS.md` | Project-local skill scaffolding |
@@ -66,6 +67,7 @@ Read the closest applicable guide in addition to this root contract:
 ./.venv/bin/ruff check src scripts tests examples
 ./.venv/bin/python -m pytest tests/ --cov=active_inference_power --cov-branch --cov-fail-under=95
 env -u VIRTUAL_ENV uv run mypy src scripts tests examples --ignore-missing-imports
+./.venv/bin/python scripts/validate_gnn_specs.py
 ```
 
 For a source-bound candidate, use the complete recipe in

@@ -152,6 +152,7 @@ def test_entry_and_registry_contracts_reject_invalid_values() -> None:
         ("source_paths", ("docs/not-src.py",)),
         ("test_paths", ("src/not-tests.py",)),
         ("assumptions", ("",)),
+        ("citations", ("",)),
     ):
         with pytest.raises(ValueError):
             FormalismEntry(**{**base, key: value})
@@ -159,3 +160,12 @@ def test_entry_and_registry_contracts_reject_invalid_values() -> None:
         FormalismRegistry(())
     with pytest.raises(ValueError):
         FormalismRegistry(formalism_registry().entries, schema_version="1.0")
+
+
+def test_registry_validation_rejects_stale_counts_and_missing_roots(tmp_path: Path) -> None:
+    """A tampered entry count and an absent checkout root both fail closed."""
+    payload = formalism_registry().to_mapping()
+    with pytest.raises(ValueError, match="entries do not match"):
+        validate_formalism_registry({**payload, "entry_count": payload["entry_count"] + 1})
+    with pytest.raises(ValueError, match="project root"):
+        validate_formalism_registry(payload, project_root=tmp_path / "missing")

@@ -38,7 +38,10 @@ from scripts.release_provenance import (
 )
 from scripts.regenerate_figures import _invalidate_release_completion
 from scripts.run_ledger import RunLedger
-from scripts.z_generate_manuscript_variables import _hydration_pending
+from scripts.z_generate_manuscript_variables import (
+    _hydration_pending,
+    _requires_ledger_artifacts,
+)
 from active_inference_power.schema import validate_run_log
 from active_inference_power.certificates import CERTIFICATE_NAMES
 
@@ -720,3 +723,31 @@ def test_invalid_run_writes_failure_ledger_before_reraising(tmp_path: Path) -> N
     validate_run_log(ledger)
     assert ledger["status"] == "failed"
     assert ledger["error"]["type"] == "ValueError"
+
+
+def test_ledger_artifact_requirement_is_scoped_to_complete_default_trees() -> None:
+    """A clean-checkout fast bundle proves its own artifacts, not other roots'."""
+    assert (
+        _requires_ledger_artifacts(
+            allow_draft=False, output_is_default=True, complete_before_hydration=True
+        )
+        is True
+    )
+    assert (
+        _requires_ledger_artifacts(
+            allow_draft=False, output_is_default=True, complete_before_hydration=False
+        )
+        is False
+    )
+    assert (
+        _requires_ledger_artifacts(
+            allow_draft=False, output_is_default=False, complete_before_hydration=True
+        )
+        is False
+    )
+    assert (
+        _requires_ledger_artifacts(
+            allow_draft=True, output_is_default=True, complete_before_hydration=True
+        )
+        is False
+    )

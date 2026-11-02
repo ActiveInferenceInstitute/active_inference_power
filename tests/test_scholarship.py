@@ -543,7 +543,11 @@ def test_claim_ledger_is_schema_checked_and_claim_bearing_rows_have_boundaries()
     ledger = yaml.safe_load(
         (PROJECT_ROOT / "data" / "claim_ledger.yaml").read_text(encoding="utf-8")
     )
-    validate_claim_ledger(ledger, project_root=PROJECT_ROOT, require_artifacts=True)
+    # Schema-only against the shipped ledger: whether the declared artifacts exist
+    # is a candidate-bundle property, and the artifact requirement itself is
+    # exercised with a producer-built file in tests/test_artifacts.py. Requiring a
+    # generated output/ bundle here made the unit suite fail on any clean checkout.
+    validate_claim_ledger(ledger, project_root=PROJECT_ROOT)
     claim_rows = {
         claim["claim_id"]: claim
         for claim in ledger["claims"]

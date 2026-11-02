@@ -13,7 +13,7 @@ description = "Conditional adaptive-study design comparisons, multiple testing, 
 authors = [
     {name = "Daniel Ari Friedman", email = "daniel@activeinference.institute"}
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = {file = "LICENSE"}
 dependencies = [
     "numpy>=1.24.0",
