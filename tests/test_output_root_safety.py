@@ -160,7 +160,8 @@ def test_ci_pins_the_lock_compatible_uv_release_and_covers_declared_python_floor
         encoding="utf-8"
     )
     assert 'python-version: ["3.11", "3.12", "3.13", "3.14"]' in workflow
-    assert workflow.count('version: "0.13.6"') == 2
+    # The test matrix, fast-artifacts, and the dedicated GNN conformance job.
+    assert workflow.count('version: "0.13.6"') == 3
     assert "version: latest" not in workflow
     assert "uv lock --check" in workflow
     assert "compileall -q src scripts tests examples" in workflow
