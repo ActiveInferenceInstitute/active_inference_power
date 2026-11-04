@@ -22,13 +22,45 @@ jobs:
       - run: uv run --extra dev python -m compileall -q src scripts tests examples
       - run: uv run --extra dev ruff check src scripts tests examples
       - run: uv run --extra dev mypy src scripts tests examples --ignore-missing-imports
-      - run: uv run --extra dev python scripts/validate_gnn_specs.py
       - run: uv run --extra dev python -m pytest tests/ --cov=active_inference_power --cov-branch --cov-fail-under=95 -q
       - run: uv build --out-dir /tmp/active-inference-power-wheel
       - run: uv run python -c "import active_inference_power; print(active_inference_power.__name__)"
       - run: uv venv /tmp/active-inference-power-clean-venv
       - run: uv pip install --python /tmp/active-inference-power-clean-venv/bin/python /tmp/active-inference-power-wheel/*.whl
       - run: /tmp/active-inference-power-clean-venv/bin/python -c "import active_inference_power; print(active_inference_power.PowerScenario.__name__)"
+
+  gnn-conformance:
+    name: gnn conformance (pinned v5.0.3)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: "0.13.6"
+          python-version: "3.14"
+      - run: uv sync --locked --extra dev
+      - name: Check out the pinned GNN release
+        run: |
+          set -euo pipefail
+          PIN=models/gnn-pin.json
+          PY=$(uv python find --no-project 3.14)
+          REPO=$("$PY" -c "import json;print(json.load(open('$PIN'))['repository'])")
+          TAG=$("$PY" -c "import json;print(json.load(open('$PIN'))['tag'])")
+          COMMIT=$("$PY" -c "import json;print(json.load(open('$PIN'))['commit'])")
+          # The checkout follows models/gnn-pin.json; a pin bump re-points it.
+          git clone --depth 1 --branch "$TAG" "$REPO" ../Generalized_Notation_Notation
+          test "$(git -C ../Generalized_Notation_Notation rev-parse HEAD)" = "$COMMIT"
+          # The parser package imports its dependency surface; give the
+          # checkout-local interpreter the pinned package and its dependencies.
+          uv venv --python 3.14 ../Generalized_Notation_Notation/.venv
+          uv pip install --python ../Generalized_Notation_Notation/.venv/bin/python \
+            ../Generalized_Notation_Notation
+      - name: Validate the GNN specifications against the pinned parser
+        env:
+          ACTIVE_INFERENCE_POWER_GNN_ROOT: ${{ github.workspace }}/../Generalized_Notation_Notation
+        run: |
+          uv run --extra dev python scripts/validate_gnn_specs.py
+          uv run --extra dev pytest tests/test_gnn_specs.py -q
 
   fast-artifacts:
     runs-on: ubuntu-latest
