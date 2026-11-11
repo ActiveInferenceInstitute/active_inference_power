@@ -317,3 +317,11 @@ bound is estimated from the same p-values used for rejection, this is an
 assumption-gated diagnostic. An independent split avoids reusing the selection
 stream but supplies only the declared conditional calibration evidence, not a
 general finite-sample FDR theorem.
+
+## InstituteOS sidecar
+
+This repository carries a committed [`.aii/`](.aii/README.md) sidecar with curated
+InstituteOS metadata (`aii-sidecar/v1`): category, maturity, ecosystem relations,
+key artifacts, provenance, and portable tasks. It is read by
+[InstituteOS](https://github.com/ActiveInferenceInstitute/InstituteOS) tooling and
+does not affect the project's build or runtime.
