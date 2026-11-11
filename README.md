@@ -26,7 +26,7 @@ and the exact action-loop estimand.
 The suite includes a tested family of correction procedures, replication-level
 FDP, true-positive-rate, and any-false-rejection-event scoring aggregated as
 FDR, power, and FWER, analytic z/t power, the Genovese--Wasserman BH fixed
-point, seeded dependence-aware simulations, real `inferactively-pymdp==1.0.3`
+point, seeded dependence-aware simulations, real `inferactively-pymdp==1.0.4`
 inference, and action-in-the-loop environments with adaptive sensing, target
 selection, costs, latent context transitions, and stopping.
 

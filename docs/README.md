@@ -55,6 +55,7 @@
 | [quickstart.md](quickstart.md) | First successful run |
 | [troubleshooting.md](troubleshooting.md) | Failure diagnosis |
 | [faq.md](faq.md) | Scientific and operational questions |
+| [AGENTS.md](AGENTS.md) | Documentation conventions for maintainers and agents |
 
 Run `./.venv/bin/python scripts/audit_documentation_links.py` after changing
 navigation or local Markdown destinations.

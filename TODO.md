@@ -2,9 +2,10 @@
 
 This workboard distinguishes completed release hardening from future research
 work. Completed items remain listed with their source-bound evidence so later
-extensions can retain the same gates. There are currently no open, locally
-executable workboard tickets: the R and G sections preserve completed evidence
-lanes and claim decisions. Any new extension must first be entered as a bounded
+extensions can retain the same gates. There are no open, locally executable
+workboard tickets; one minor metadata decision remains open below. The R and G
+sections preserve completed evidence lanes and claim decisions. Any new
+extension must first be entered as a bounded
 task with its estimand, evidence class, and acceptance gate. The retained
 evidence boundaries remain in
 [`docs/research_roadmap.md`](docs/research_roadmap.md),
@@ -46,6 +47,12 @@ hash-linked, source-bound release bundle recorded below.
   release generation must not fetch benchmark data. The completed benchmark
   preflight receipt is not an acquisition, license adjudication, or external
   benchmark release.
+
+## Open minor — version metadata drift
+
+| ID | Open scope | Evidence and boundary |
+|---|---|---|
+| M6 | The frozen manuscript metadata declares `pymdp_version: "1.0.3"` in `manuscript/config.yaml` and `manuscript/config.yaml.example`, while the package pin in `pyproject.toml` is `inferactively-pymdp==1.0.4`. The 1.0.3 value is the v1.0.0 release's recorded dependency version. The manuscript files are frozen release evidence and are not edited by this pass. A future source-contract refresh should decide whether to re-record the manuscript variable to the current pin or keep the release version and state that scope explicitly. | `manuscript/config.yaml` and `manuscript/config.yaml.example` (frozen), `scripts/generate_results.py:2026` (the `pymdp_version` fallback default), and `pyproject.toml` (current pin). The live `README.md` description was updated to `==1.0.4` in this pass; the frozen manuscript metadata remains at 1.0.3. |
 
 ## Completed minor — maintenance and reader-facing quality
 
