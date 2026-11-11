@@ -23,7 +23,7 @@ Institute repositories without touching this project's own content. The schema i
 | Repository | `ActiveInferenceInstitute/active_inference_power` |
 | Category | `research-software` |
 | Status | `active` |
-| Maturity | `wip` |
+| Maturity | `released` |
 | License | `MIT` |
 | Default branch | `main` |
 | Homepage | — |
@@ -45,7 +45,7 @@ Institute repositories without touching this project's own content. The schema i
 
 | Task | Command | Working directory | Description |
 | --- | --- | --- | --- |
-| `test` | `python -m pytest` | `.` | Run the test suite. |
+| `test` | `python -m pytest tests` | `.` | Run the test suite. |
 
 ## Links
 

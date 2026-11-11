@@ -8,7 +8,7 @@
 | Affiliation | `institute` |
 | Category | `research-software` |
 | Status | `active` |
-| Maturity | `wip` |
+| Maturity | `released` |
 | Steward | Active Inference Institute |
 | Default branch | `main` |
 | Current release | — |
@@ -53,7 +53,7 @@
 
 | Task | Command | Working directory | Description |
 | --- | --- | --- | --- |
-| `test` | `python -m pytest` | `.` | Run the test suite. |
+| `test` | `python -m pytest tests` | `.` | Run the test suite. |
 
 ## Validation
 

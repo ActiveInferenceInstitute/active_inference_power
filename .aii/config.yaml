@@ -1,7 +1,7 @@
 # AII sidecar — InstituteOS metadata. Schema: aii_platform.aii_sidecar
 meta:
   sidecar_version: 1.2.1
-  updated: '2026-11-10'
+  updated: '2026-11-11'
 repo:
   name: active_inference_power
   slug: active-inference-power
@@ -11,6 +11,7 @@ repo:
     e-processes, and declared operating characteristics.
 institute:
   category: research-software
+  maturity: released
   steward: Active Inference Institute
 ecosystem:
   relations:
@@ -58,7 +59,7 @@ artifacts:
 provenance:
   license: MIT
   citation:
-    doi: 10.5281/zenodo.21695160](https://doi.org/10.5281/zenodo.21695160
+    doi: 10.5281/zenodo.21695160
     text: Active Inference Institute — active_inference_power.
 instituteos:
   tags:
@@ -78,7 +79,7 @@ capabilities:
 - citation
 tasks:
   test:
-    cmd: python -m pytest
+    cmd: python -m pytest tests
     description: Run the test suite.
 docs:
 - README.md
