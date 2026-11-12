@@ -27,6 +27,9 @@ COMMANDS: dict[str, tuple[tuple[str, ...], ...]] = {
         (PYTHON, "scripts/measure_gates.py", "--check"),
     ),
     "gnn": (
+        # The estate's single pin/pointer/specification reader, run against the
+        # pinned revision; the two member checks below it are not its substitute.
+        (PYTHON, "scripts/gnn_importer_check.py"),
         (PYTHON, "scripts/validate_gnn_specs.py"),
         (PYTHON, "-m", "pytest", "tests/test_gnn_specs.py", "-q"),
     ),

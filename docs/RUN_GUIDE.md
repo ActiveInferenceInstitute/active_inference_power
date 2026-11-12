@@ -35,7 +35,7 @@ the complete source-gate composition.
 | `./run.sh test-fast` | Existing `not slow` selector; the full-lane marker also covers consumers of the real generated-bundle fixture; no release coverage claim |
 | `./run.sh test-full` | Existing quality-report producer: full pytest with configured 95% line/branch coverage gates, writing coverage and quality evidence under `output/` |
 | `./run.sh docs` | Local Markdown-link audit and checked generated gate documentation; checks do not rewrite evidence |
-| `./run.sh gnn` | Specification/runtime validation and GNN specification tests against the pinned upstream parser; missing upstream prerequisites fail rather than silently skip conformance |
+| `./run.sh gnn` | The shared `gnn.importers` reader over the pin, this repository's GNN pointer and every specification, then specification/runtime binding and GNN specification tests against the pinned upstream parser; missing upstream prerequisites fail rather than silently skip conformance |
 | `./run.sh package` | Package build and clean wheel-install/import checks |
 | `./run.sh all` | Aggregate: lint, types, test-full, docs, gnn, package, in that order |
 
@@ -62,11 +62,19 @@ finalize, or publish a bundle.
 
 The authoritative pin is [`models/gnn-pin.json`](../models/gnn-pin.json), using
 schema `gnn-importer-pin/v1`. It identifies
-`ActiveInferenceInstitute/Generalized_Notation_Notation`, tag `v5.0.3`,
-version `5.0.3`, and exact commit
-`8f293d9ba810e6eda5c09842d9c7ed9ffa5f92c1`. The parser entry point is
+`ActiveInferenceInstitute/Generalized_Notation_Notation`, tag `v5.1.0`,
+version `5.1.0`, and exact commit
+`75c834bd8519dc7b5adc4d24f16bf393cfd1ecdf`. The parser entry point is
 `gnn.parsers.markdown_parser:MarkdownGNNParser`; the pin also retains its
 recording dates. Do not replace this identity with the current upstream branch.
+
+The pin, this repository's `.github/GNN.md` pointer, and the specifications'
+syntax are read by `gnn.importers` — the estate's one reader — which the arm
+runs as `python -m gnn.importers check --repo .` against the pinned revision.
+This repository carries no pin reader of its own: until `v5.1.0` shipped that
+module the pin was `v5.0.3` at `8f293d9ba810e6eda5c09842d9c7ed9ffa5f92c1`, which
+predates it, and an interim local reader stood in. The local reader was deleted
+in the same change that advanced the pin.
 
 Provision the pinned upstream Git checkout and its parser environment before
 an offline run. Set `ACTIVE_INFERENCE_POWER_GNN_ROOT` to that checkout's path

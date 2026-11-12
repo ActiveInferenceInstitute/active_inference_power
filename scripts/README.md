@@ -6,6 +6,11 @@ Scripts are thin command-line orchestrators:
   interface. It owns leaf commands and aggregate composition for local and CI
   source checks; use the [run guide](../docs/RUN_GUIDE.md), rather than copying
   its command table into another script or workflow;
+- `gnn_importer_check.py` runs the estate's shared `python -m gnn.importers
+  check --repo .` reader for the pin, the GNN pointer, and every shipped
+  specification, under the pinned checkout's interpreter with the pinned
+  commit's `src/gnn` extracted from Git; this repository carries no pin reader
+  of its own;
 - `measure_gates.py` records bounded before/after gate executions and produces
   the checked [gate runtime evidence](../docs/_generated/gate-runtimes.md)
   and its machine-readable companion. These host-specific measurements are

@@ -191,9 +191,11 @@ Numeric values stay owned by the runtime contracts; the specifications declare
 the structure and are checked against the real runtime model by
 [`scripts/validate_gnn_specs.py`](scripts/validate_gnn_specs.py). The custody
 pin [`models/gnn-pin.json`](models/gnn-pin.json) records the canonical upstream
-release (v5.0.3), and `tests/test_gnn_specs.py` additionally requires digest
-equality with the pinned upstream parser when the sibling
-`Generalized_Notation_Notation` checkout is available. Model authoring starts
+release (v5.1.0) and is read by upstream `gnn.importers`, which the `gnn` arm
+runs as `python -m gnn.importers check --repo .` against the pinned revision.
+`tests/test_gnn_specs.py` additionally requires digest equality with the pinned
+upstream parser when the sibling `Generalized_Notation_Notation` checkout is
+available. Model authoring starts
 from the GNN
 [template library](https://github.com/ActiveInferenceInstitute/Generalized_Notation_Notation/blob/main/docs/templates/README.md)
 and

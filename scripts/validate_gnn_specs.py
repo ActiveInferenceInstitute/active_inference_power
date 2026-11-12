@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 """Validate the shipped GNN specifications against their runtime models.
 
-Reads ``models/*.gnn.md`` and ``models/gnn-pin.json`` and prints a deterministic
-JSON report: every declared matrix must match the runtime model built by the
-real contract (``build_generative_model`` / ``make_reference_action_scenario``).
-The upstream-parser conformance check lives in ``tests/test_gnn_specs.py``
-because it needs the pinned checkout's interpreter.
+Reads ``models/*.gnn.md`` and prints a deterministic JSON report: every
+declared matrix must match the runtime model built by the real contract
+(``build_generative_model`` / ``make_reference_action_scenario``).
+
+The pin, the ``.github/GNN.md`` pointer and the specifications' upstream syntax
+are ``gnn.importers``' check, which the ``gnn`` arm runs as
+``scripts/gnn_importer_check.py``. The upstream-parser digest comparison lives
+in ``tests/test_gnn_specs.py`` because it needs the pinned checkout's
+interpreter.
 """
 
 from __future__ import annotations

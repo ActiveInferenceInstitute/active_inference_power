@@ -28,12 +28,17 @@ declared matrix is checked against the real runtime arrays. Validate with:
 ./.venv/bin/python scripts/validate_gnn_specs.py
 ```
 
-`src/active_inference_power/gnn_specs.py` owns the reader, the runtime binding,
-and the upstream digest comparison. `tests/test_gnn_specs.py` additionally runs
-the pinned upstream parser (pinned commit's `src/gnn` extracted from Git) and
-requires digest equality; it skips with an explicit reason when the sibling
-`Generalized_Notation_Notation` checkout is unavailable.
+The pin itself is read by upstream `gnn.importers` — the estate's one reader —
+which the `gnn` arm runs as `python -m gnn.importers check --repo .` against the
+pinned revision. `src/active_inference_power/gnn_specs.py` owns the project
+specification parser, the runtime binding, and the pinned-upstream digest
+comparison; it does not validate a pin shape.
+`tests/test_gnn_specs.py` additionally runs the pinned upstream parser (pinned
+commit's `src/gnn` extracted from Git) and requires digest equality; it skips
+with an explicit reason when the sibling `Generalized_Notation_Notation`
+checkout is unavailable.
 
 Re-pinning is a deliberate change: update `gnn-pin.json` to the new canonical
 release (commit + upstream `version` + `date_recorded`, with `tag` when the
-release is tagged) and re-run the validation script and the conformance test.
+release is tagged) and re-run `./run.sh gnn`, which exercises the shared reader,
+the runtime binding, and the conformance test.

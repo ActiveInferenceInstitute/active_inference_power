@@ -10,6 +10,11 @@ extracted from Git onto ``PYTHONPATH``, so the bytes under test are the pinned
 release's bytes, not the live working tree's. The checkout is treated as
 read-only (``git archive`` / ``git cat-file`` only).
 
+The pin is read by ``gnn.importers``, which the ``gnn`` gate arm runs as
+``python -m gnn.importers check --repo .``; nothing here re-implements that
+reader. These tests assert the pin's declared identity and drive the member
+evidence — runtime binding plus pinned-parser digest equality.
+
 When the checkout or its ``.venv`` is unavailable the upstream tests skip with
 an explicit reason; setting ``ACTIVE_INFERENCE_POWER_GNN_ROOT`` selects a
 checkout explicitly (and then an unavailable checkout is a failure, not a skip).
@@ -17,11 +22,9 @@ checkout explicitly (and then an unavailable checkout is a failure, not a skip).
 
 from __future__ import annotations
 
-import io
 import json
 import os
 import subprocess
-import tarfile
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, cast
@@ -35,16 +38,18 @@ from active_inference_power.gnn_specs import (
     PIN_RELATIVE_PATH,
     SPEC_DIRNAME,
     GnnSpecError,
-    UpstreamPinError,
+    PinnedRevision,
+    UpstreamInputError,
     binding_issues,
     check_specs,
     checkout_available,
     default_gnn_root,
     digest_divergences,
+    extract_pinned_src,
     gnn_checkout_python,
-    load_upstream_pin,
     normalize_upstream_digest,
     parse_spec,
+    pinned_revision,
     resolve_gnn_root,
     runtime_matrices,
     spec_digest,
@@ -58,8 +63,10 @@ SHIPPED_SPECS = sorted((ROOT / SPEC_DIRNAME).glob("*.gnn.md"))
 
 #: The canonical workstream pin. Bumping it is a deliberate act: this test pins
 #: the pin, so a silent re-pin cannot pass unnoticed.
-CANONICAL_TAG = "v5.0.3"
-CANONICAL_COMMIT = "8f293d9ba810e6eda5c09842d9c7ed9ffa5f92c1"
+CANONICAL_TAG = "v5.1.0"
+CANONICAL_COMMIT = "75c834bd8519dc7b5adc4d24f16bf393cfd1ecdf"
+CANONICAL_VERSION = "5.1.0"
+CANONICAL_RECORDED = "2026-11-12"
 
 #: Normative required sections of the GNN v1 compliance contract
 #: (``gnn.schemas.section_contract.REQUIRED_SECTIONS``); the pinned upstream
@@ -81,7 +88,7 @@ REQUIRED_SPEC_SECTIONS = (
 class UpstreamRun:
     """One execution of the pinned upstream parser over the shipped specs."""
 
-    pin: Any
+    revision: PinnedRevision
     payload: dict[str, Any]
     mutant: Path
     extract_dir: Path
@@ -89,8 +96,8 @@ class UpstreamRun:
 
 @pytest.fixture(scope="module")
 def upstream_run(tmp_path_factory: pytest.TempPathFactory) -> UpstreamRun:
-    """Execute the pinned upstream parser on every shipped spec + a leniency mutant."""
-    pin = load_upstream_pin(PIN_PATH)
+    """Execute the pinned upstream parser on every shipped spec + a divergence mutant."""
+    revision = pinned_revision(ROOT)
     root = resolve_gnn_root(ROOT)
     explicit = ENV_UPSTREAM_ROOT in os.environ
     if not checkout_available(root):
@@ -101,39 +108,23 @@ def upstream_run(tmp_path_factory: pytest.TempPathFactory) -> UpstreamRun:
             pytest.fail(message)
         pytest.skip(message)
 
-    presence = subprocess.run(
-        ["git", "-C", str(root), "cat-file", "-e", f"{pin.commit}^{{commit}}"],
-        capture_output=True,
-        text=True,
-    )
-    assert presence.returncode == 0, (
-        f"pinned commit {pin.commit} is not present in {root}; fetch the pinned release before "
-        "running the upstream conformance check"
-    )
-
     extract_dir = tmp_path_factory.mktemp("gnn_upstream_pin")
-    archive = subprocess.run(
-        ["git", "-C", str(root), "archive", pin.commit, "src/gnn"],
-        check=True,
-        capture_output=True,
-    )
-    with tarfile.open(fileobj=io.BytesIO(archive.stdout)) as stream:
-        stream.extractall(extract_dir, filter="data")
+    src = extract_pinned_src(root, revision.commit, extract_dir)
 
-    # Leniency mutant: the spaced section name is ignored by the upstream
-    # parser (canonical inventory: `## ActInfOntologyAnnotation`), while the
-    # project reader accepts both spellings. Used as the non-vacuity control.
-    mutant = extract_dir / "spaced_ontology.gnn.md"
+    # Divergence mutant: the project reader keeps the last
+    # ``InitialParameterization`` block for a variable and the pinned upstream
+    # parser keeps the first. Used as the non-vacuity control.
+    mutant = extract_dir / "duplicate_parameter.gnn.md"
     mutant.write_text(
         (ROOT / SPEC_DIRNAME / "sequential_evidence_agent.gnn.md")
         .read_text(encoding="utf-8")
-        .replace("## ActInfOntologyAnnotation", "## ActInf Ontology Annotation"),
+        .replace("C={(0.0, 0.0)}", "C={(0.0, 0.0)}\n\nC={(0.5, 0.5)}"),
         encoding="utf-8",
     )
 
     spec_files = [str(path.resolve()) for path in SHIPPED_SPECS] + [str(mutant)]
-    env = {**os.environ, "PYTHONPATH": str(extract_dir / "src")}
-    parser_module, parser_class = pin.parser_entry_point()
+    env = {**os.environ, "PYTHONPATH": str(src)}
+    parser_module, parser_class = revision.parser_module, revision.parser_class
     command = [
         str(gnn_checkout_python(root)),
         "-c",
@@ -149,7 +140,7 @@ def upstream_run(tmp_path_factory: pytest.TempPathFactory) -> UpstreamRun:
     assert proc.returncode == 0, f"upstream digest driver failed:\n{proc.stderr}"
 
     return UpstreamRun(
-        pin=pin,
+        revision=revision,
         payload=json.loads(proc.stdout),
         mutant=mutant,
         extract_dir=extract_dir,
@@ -157,90 +148,41 @@ def upstream_run(tmp_path_factory: pytest.TempPathFactory) -> UpstreamRun:
 
 
 def test_pin_file_names_the_canonical_release() -> None:
-    """The shipped pin is the canonical workstream pin (v5.0.3)."""
-    pin = load_upstream_pin(PIN_PATH)
-    assert pin.tag == CANONICAL_TAG
-    assert pin.commit == CANONICAL_COMMIT
-    assert pin.version == "5.0.3"
-    assert pin.date_recorded == "2026-11-01"
-    assert pin.parser_entry_point() == ("gnn.parsers.markdown_parser", "MarkdownGNNParser")
+    """The shipped pin is the canonical workstream pin (v5.1.0)."""
+    data = json.loads(PIN_PATH.read_text(encoding="utf-8"))
+    assert data["tag"] == CANONICAL_TAG
+    assert data["commit"] == CANONICAL_COMMIT
+    assert data["version"] == CANONICAL_VERSION
+    assert data["date_recorded"] == CANONICAL_RECORDED
+    revision = pinned_revision(ROOT)
+    assert revision.commit == CANONICAL_COMMIT
+    assert (revision.parser_module, revision.parser_class) == (
+        "gnn.parsers.markdown_parser",
+        "MarkdownGNNParser",
+    )
 
 
 def test_pin_file_declares_the_importer_pin_schema() -> None:
     """The pin carries the canonical importer-pin schema and its record date."""
     data = json.loads(PIN_PATH.read_text(encoding="utf-8"))
     assert data["schema"] == "gnn-importer-pin/v1"
-    assert data["recorded"]
-    # The upstream release loader models only its own identity, so the
-    # importer-pin fields travel in ``extras``: neither key may be dropped.
-    pin = load_upstream_pin(PIN_PATH)
-    assert pin.extras["schema"] == "gnn-importer-pin/v1"
-    assert pin.extras["recorded"] == data["recorded"]
+    assert data["recorded"] == CANONICAL_RECORDED
 
 
-@pytest.mark.parametrize(
-    "mutate, message",
-    [
-        (
-            lambda data: {k: v for k, v in data.items() if k != "commit"},
-            "complete Git object identity|must declare",
-        ),
-        (
-            lambda data: {k: v for k, v in data.items() if k != "version"},
-            "must declare",
-        ),
-        (
-            lambda data: {k: v for k, v in data.items() if k != "date_recorded"},
-            "must declare",
-        ),
-        (lambda data: {**data, "repository": "git@github.com:x/y.git"}, "HTTPS GitHub URL"),
-        (lambda data: {**data, "tag": "5.0.3"}, "stable version"),
-        (lambda data: {**data, "tag": "v5.0.4"}, "same release"),
-        (lambda data: {**data, "version": "5.0"}, "release version"),
-        (lambda data: {**data, "date_recorded": "2026-13-01"}, "ISO date"),
-        (lambda data: {**data, "commit": "abc123"}, "complete Git object identity"),
-        (lambda data: {**data, "parser_module": "markdown_parser"}, "dotted import path"),
-        (lambda data: {**data, "parser_class": "not a class"}, "Python identifier"),
-        (lambda data: {**data, "tag": 503}, "fields must be strings"),
-    ],
-)
-def test_pin_loader_rejects_malformed_pins(tmp_path: Path, mutate: Any, message: str) -> None:
-    """Every malformed pin shape is refused with a targeted error."""
+def test_pinned_revision_refuses_a_pin_without_the_needed_fields(tmp_path: Path) -> None:
+    """Selection refuses an absent or partial pin instead of guessing a revision."""
+    with pytest.raises(UpstreamInputError, match="cannot read the pinned revision"):
+        pinned_revision(tmp_path)
+    models = tmp_path / SPEC_DIRNAME
+    models.mkdir()
     data = json.loads(PIN_PATH.read_text(encoding="utf-8"))
-    broken = tmp_path / "gnn-pin.json"
-    broken.write_text(json.dumps(mutate(data)), encoding="utf-8")
-    with pytest.raises(UpstreamPinError, match=message):
-        load_upstream_pin(broken)
-
-
-def test_pin_loader_keeps_extra_fields_and_accepts_a_tagless_core(tmp_path: Path) -> None:
-    """Extra keys live in ``extras``; the parser entry point is optional."""
-    data = json.loads(PIN_PATH.read_text(encoding="utf-8"))
-    minimal = {
-        key: data[key] for key in ("repository", "commit", "version", "date_recorded")
-    }
-    minimal["digest_map"] = {"specs": 2}
-    path = tmp_path / "gnn-pin.json"
-    path.write_text(json.dumps(minimal), encoding="utf-8")
-    pin = load_upstream_pin(path)
-    assert pin.tag is None
-    assert pin.parser_module is None
-    assert pin.extras == {"digest_map": {"specs": 2}}
-    with pytest.raises(UpstreamPinError, match="parser entry point"):
-        pin.parser_entry_point()
-
-
-def test_pin_loader_rejects_duplicate_and_missing_files(tmp_path: Path) -> None:
-    """A duplicated field is ambiguous; a missing pin is an explicit error."""
-    text = PIN_PATH.read_text(encoding="utf-8").replace(
-        '"commit":', f'"commit": "{CANONICAL_COMMIT}",\n  "commit":', 1
-    )
-    duplicate = tmp_path / "gnn-pin.json"
-    duplicate.write_text(text, encoding="utf-8")
-    with pytest.raises(UpstreamPinError, match="duplicate"):
-        load_upstream_pin(duplicate)
-    with pytest.raises(UpstreamPinError, match="cannot read upstream pin"):
-        load_upstream_pin(tmp_path / "absent.json")
+    partial = {key: value for key, value in data.items() if key != "parser_class"}
+    (models / "gnn-pin.json").write_text(json.dumps(partial), encoding="utf-8")
+    with pytest.raises(UpstreamInputError, match="must declare"):
+        pinned_revision(tmp_path)
+    (models / "gnn-pin.json").write_text('["not", "an", "object"]', encoding="utf-8")
+    with pytest.raises(UpstreamInputError, match="must be a JSON object"):
+        pinned_revision(tmp_path)
 
 
 def test_checkout_resolution_and_availability(tmp_path: Path) -> None:
@@ -249,7 +191,7 @@ def test_checkout_resolution_and_availability(tmp_path: Path) -> None:
     chosen.mkdir()
     assert resolve_gnn_root(ROOT, {ENV_UPSTREAM_ROOT: str(chosen)}) == chosen.resolve()
     assert resolve_gnn_root(ROOT, {}) == default_gnn_root(ROOT)
-    with pytest.raises(UpstreamPinError, match="must not be empty"):
+    with pytest.raises(UpstreamInputError, match="must not be empty"):
         resolve_gnn_root(ROOT, {ENV_UPSTREAM_ROOT: "  "})
     assert checkout_available(chosen) is False
     assert gnn_checkout_python(chosen) == chosen / ".venv" / "bin" / "python"
@@ -263,12 +205,7 @@ def test_shipped_specs_parse_and_bind_to_the_runtime_models() -> None:
     ]
     report = check_specs(ROOT)
     assert report["passed"] is True
-    assert report["pin"] == {
-        "repository": "https://github.com/ActiveInferenceInstitute/Generalized_Notation_Notation",
-        "commit": CANONICAL_COMMIT,
-        "version": "5.0.3",
-        "date_recorded": "2026-11-01",
-    }
+    assert "pin" not in report  # the pin is read once, by gnn.importers
     rows = {str(row["runtime_model"]): row for row in cast(list[dict[str, Any]], report["specs"])}
     assert set(rows) == {"reference_action_loop", "sequential_evidence_agent"}
     assert all(row["passed"] is True and row["binding_issues"] == [] for row in rows.values())
@@ -366,7 +303,6 @@ def test_check_specs_fails_closed_on_a_drifted_copy(tmp_path: Path) -> None:
     """A spec whose declared dims drift from the runtime model fails the report."""
     spec_dir = tmp_path / SPEC_DIRNAME
     spec_dir.mkdir()
-    (spec_dir / "gnn-pin.json").write_text(PIN_PATH.read_text(encoding="utf-8"), encoding="utf-8")
     drifted = (ROOT / SPEC_DIRNAME / "sequential_evidence_agent.gnn.md").read_text(encoding="utf-8")
     (spec_dir / "sequential_evidence_agent.gnn.md").write_text(
         drifted.replace("B[2,2,1,type=float]", "B[2,2,2,type=float]"), encoding="utf-8"
@@ -574,9 +510,9 @@ def test_digest_normalization_and_divergence_controls() -> None:
     )
     assert normalize_upstream_digest({**payload, "time": "static"})["time"] == "Static"
     assert normalize_upstream_digest({**payload, "time": "unmarked"})["time"] == "Static"
-    with pytest.raises(UpstreamPinError, match="must be a mapping"):
+    with pytest.raises(UpstreamInputError, match="must be a mapping"):
         digest_divergences({"variables": []}, {})
-    with pytest.raises(UpstreamPinError, match="missing fields"):
+    with pytest.raises(UpstreamInputError, match="missing fields"):
         normalize_upstream_digest({"model_name": "M"})
     for field, value in (
         ("variables", {}),
@@ -587,20 +523,19 @@ def test_digest_normalization_and_divergence_controls() -> None:
     ):
         broken = {key: payload[key] for key in payload}
         broken[field] = value
-        with pytest.raises(UpstreamPinError, match="must be"):
+        with pytest.raises(UpstreamInputError, match="must be"):
             normalize_upstream_digest(broken)
-    with pytest.raises(UpstreamPinError, match="variable entries must be mappings"):
+    with pytest.raises(UpstreamInputError, match="variable entries must be mappings"):
         normalize_upstream_digest({**payload, "variables": [["A"]]})
 
 
 def test_upstream_parser_ran_from_the_pinned_commit(upstream_run: UpstreamRun) -> None:
     """The executed parser module is the extracted pinned release, not the live tree."""
     parser_info = upstream_run.payload["parser"]
-    parser_module, parser_class = upstream_run.pin.parser_entry_point()
-    assert parser_info["module"] == parser_module
-    assert parser_info["class"] == parser_class
+    assert parser_info["module"] == upstream_run.revision.parser_module
+    assert parser_info["class"] == upstream_run.revision.parser_class
     assert Path(parser_info["file"]).resolve().is_relative_to(upstream_run.extract_dir.resolve())
-    assert parser_info["gnn_version"] == "5.0.3"
+    assert parser_info["gnn_version"] == CANONICAL_VERSION
 
 
 def test_upstream_parser_accepts_every_shipped_spec(upstream_run: UpstreamRun) -> None:
@@ -619,16 +554,24 @@ def test_project_digest_matches_the_pinned_upstream_parser(upstream_run: Upstrea
     assert digest_divergences(project, upstream) == []
 
 
-def test_conformance_check_discriminates_on_the_leniency_mutant(upstream_run: UpstreamRun) -> None:
-    """Non-vacuity control: the spaced ontology heading is invisible to upstream.
+def test_conformance_check_discriminates_on_a_duplicated_value_block(
+    upstream_run: UpstreamRun,
+) -> None:
+    """Non-vacuity control: the two readers resolve a duplicate block differently.
 
-    The project reader accepts the historical spaced spelling; the upstream
-    parser does not read it, so the mutant's digest must lose its ontology
-    bindings and the comparison must report the divergence.
+    The project reader keeps the last ``InitialParameterization`` block for a
+    variable and the pinned upstream parser keeps the first, so the same bytes
+    declare different values. The comparison must report that divergence rather
+    than agree vacuously.
     """
-    project = spec_digest(parse_spec(upstream_run.mutant.read_text(encoding="utf-8"), source=str(upstream_run.mutant)))
+    project = spec_digest(
+        parse_spec(upstream_run.mutant.read_text(encoding="utf-8"), source=str(upstream_run.mutant))
+    )
     upstream = normalize_upstream_digest(upstream_run.payload["specs"][str(upstream_run.mutant.resolve())])
-    assert project["ontology"] == {"s": "HiddenState", "o": "Observation", "u": "Action", "A": "LikelihoodMatrix",
-                                   "B": "TransitionMatrix", "C": "Preferences", "D": "Prior", "q_s": "PosteriorBelief"}
-    assert upstream["ontology"] == {}
-    assert any(issue.startswith("ontology:") for issue in digest_divergences(project, upstream))
+    project_parameters = cast(dict[str, Any], project["parameters"])
+    upstream_parameters = cast(dict[str, Any], upstream["parameters"])
+    assert project_parameters["C"] == [[0.5, 0.5]]
+    assert upstream_parameters["C"] == [[0.0, 0.0]]
+    assert any(
+        issue.startswith("parameters['C']") for issue in digest_divergences(project, upstream)
+    )
