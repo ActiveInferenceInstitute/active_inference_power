@@ -1,8 +1,10 @@
 {
+  "schema": "gnn-importer-pin/v1",
   "repository": "https://github.com/ActiveInferenceInstitute/Generalized_Notation_Notation",
   "commit": "8f293d9ba810e6eda5c09842d9c7ed9ffa5f92c1",
   "version": "5.0.3",
   "date_recorded": "2026-11-01",
+  "recorded": "2026-11-12",
   "tag": "v5.0.3",
   "parser_module": "gnn.parsers.markdown_parser",
   "parser_class": "MarkdownGNNParser"

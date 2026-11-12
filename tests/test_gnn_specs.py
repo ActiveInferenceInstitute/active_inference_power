@@ -166,6 +166,18 @@ def test_pin_file_names_the_canonical_release() -> None:
     assert pin.parser_entry_point() == ("gnn.parsers.markdown_parser", "MarkdownGNNParser")
 
 
+def test_pin_file_declares_the_importer_pin_schema() -> None:
+    """The pin carries the canonical importer-pin schema and its record date."""
+    data = json.loads(PIN_PATH.read_text(encoding="utf-8"))
+    assert data["schema"] == "gnn-importer-pin/v1"
+    assert data["recorded"]
+    # The upstream release loader models only its own identity, so the
+    # importer-pin fields travel in ``extras``: neither key may be dropped.
+    pin = load_upstream_pin(PIN_PATH)
+    assert pin.extras["schema"] == "gnn-importer-pin/v1"
+    assert pin.extras["recorded"] == data["recorded"]
+
+
 @pytest.mark.parametrize(
     "mutate, message",
     [

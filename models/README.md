@@ -11,10 +11,12 @@ generative models this suite evaluates, written in
 - [`reference_action_loop.gnn.md`](reference_action_loop.gnn.md) — the
   two-target/two-context action-loop reference model behind
   `scenario.py::make_reference_action_scenario`.
-- [`gnn-pin.json`](gnn-pin.json) — custody pin: the upstream repository, the
-  exact commit, the upstream `version` string from that revision's
-  `pyproject.toml`, and the date it was recorded, plus the release `tag` and the
-  parser module/class the conformance check exercises as convenience fields.
+- [`gnn-pin.json`](gnn-pin.json) — custody pin in the canonical importer-pin
+  schema (`"schema": "gnn-importer-pin/v1"`, `"recorded"`): the upstream
+  repository, the exact commit, the upstream `version` string from that
+  revision's `pyproject.toml`, and the date that identity was recorded, plus
+  the release `tag` and the parser module/class the conformance check exercises
+  as convenience fields.
 
 Both specifications declare their `## InitialParameterization`: the default
 configuration of the runtime contracts
