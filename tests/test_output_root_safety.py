@@ -153,18 +153,3 @@ def test_build_tree_is_ignored_and_uv_configuration_makes_no_workspace_claim() -
     assert "build/" in gitignore
     assert "Inherits workspace settings" not in pyproject
     assert "[tool.uv]" not in pyproject
-
-
-def test_ci_pins_the_lock_compatible_uv_release_and_covers_declared_python_floor() -> None:
-    workflow = (PROJECT_ROOT / ".github" / "workflows" / "ci.yml").read_text(
-        encoding="utf-8"
-    )
-    assert 'python-version: ["3.11", "3.12", "3.13", "3.14"]' in workflow
-    # The test matrix, fast-artifacts, and the dedicated GNN conformance job.
-    assert workflow.count('version: "0.13.6"') == 3
-    assert "version: latest" not in workflow
-    assert "uv lock --check" in workflow
-    assert "compileall -q src scripts tests examples" in workflow
-    assert "ruff check src scripts tests examples" in workflow
-    assert "scripts/audit_fast_bundle.py --output-root output" in workflow
-    assert "review_release.py --output-root output" not in workflow

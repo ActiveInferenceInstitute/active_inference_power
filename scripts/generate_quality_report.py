@@ -60,6 +60,7 @@ QUALITY_INPUT_ROOT_FILES = (
     "experiment_plan.yaml",
     "export.toml",
     "pyproject.toml",
+    "run.sh",
     "uv.lock",
 )
 
