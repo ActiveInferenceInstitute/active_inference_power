@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from scripts.audit_documentation_links import audit_documentation_links
 
 
@@ -30,11 +32,12 @@ def test_documentation_link_audit_reports_missing_local_destinations(tmp_path: P
     ]
 
 
+@pytest.mark.parametrize("generated_directory", ("output", "tmp"))
 def test_documentation_link_audit_prunes_generated_output_before_traversal(
-    tmp_path: Path,
+    tmp_path: Path, generated_directory: str,
 ) -> None:
     (tmp_path / "README.md").write_text("[home](README.md)\n", encoding="utf-8")
-    generated = tmp_path / "output" / "retained-release" / "manuscript"
+    generated = tmp_path / generated_directory / "retained-release" / "manuscript"
     generated.mkdir(parents=True)
     (generated / "README.md").write_text("[stale](missing.md)\n", encoding="utf-8")
 

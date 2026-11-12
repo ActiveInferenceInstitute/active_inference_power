@@ -30,6 +30,7 @@ _EXCLUDED_DIRECTORIES = frozenset(
         "dist",
         "node_modules",
         "output",
+        "tmp",
     }
 )
 

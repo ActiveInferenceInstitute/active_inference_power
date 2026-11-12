@@ -19,11 +19,12 @@ bundle](#rendering-a-new-candidate-bundle).
 For a release candidate, pass the same `--output-root <DIR>` to result
 generation, hydration, the reader-facing audits, both release reviews, and
 release finalization. `generate_quality_report.py` can also write its report to
-that root. The controlled release renderer currently does not: its Stage 03
-interface resolves the project's canonical `output/` path. It is not
-distributed as a public dependency; see
-[controlled_renderer.md](controlled_renderer.md) for the public
-reproducibility boundary.
+that root. The controlled release renderer's Stage 03 interface resolves the
+project's canonical `output/` path. The authoritative repository-owned render
+command, `scripts/render_manuscript.py`, safely binds an explicit candidate to
+that path while delegating typesetting to the provisioned renderer. It does not
+distribute or replace that engine; see
+[controlled_renderer.md](controlled_renderer.md) for the provisioning boundary.
 
 ## Quality-gate fixture boundary
 
@@ -66,13 +67,12 @@ render review or finalization.
 
 ## Rendering a new candidate bundle
 
-Stage 03 has no `--output-root` option. To render a new candidate without
-overwriting the existing canonical output, first hydrate and audit that bundle
-with its explicit root. Confirm the quality-gate fixture boundary above before
-running the quality producer. Then, only while
-no other process is reading or writing this project's `output/`, temporarily
-bind the renderer's canonical path to the candidate bundle. This is a
-reversible filesystem binding, not a copy of the template engine.
+Stage 03 has no `--output-root` option. Generate, strictly hydrate, and audit a
+new candidate with its explicit root, then use the repository-owned wrapper
+below. It temporarily binds the renderer's canonical path to that candidate
+without copying the engine or changing renderer project links. No other process
+may read or write this project's `output/` during the binding; the wrapper's
+advisory lock serializes wrapper invocations, not unrelated producers.
 
 ```bash
 project_root="$(git rev-parse --show-toplevel)"
@@ -99,100 +99,53 @@ test ! -L "$isolated_root"
 
 ```
 
-In the controlled maintainer environment, set
-`AIP_RELEASE_RENDERER_ROOT` to the configured renderer checkout. First check
-the link state without changing it, then render without automatic manuscript
-hydration. Use the scoped function below rather than a manual
-move/link/restore sequence: it installs an `EXIT`/`INT`/`TERM` trap before it
-moves `output/`, restores only the exact binding it created, and refuses to
-overwrite an unexpected path.
+The single authoritative render command is:
 
 ```bash
-render_candidate_through_template() (
-  set -eu
-  : "${AIP_RELEASE_RENDERER_ROOT:?set to the controlled renderer checkout}"
-  output_path="$project_root/output"
-  candidate_root="$isolated_root"
-  case "$candidate_root" in
-    "$output_path"/*) ;;
-    *)
-      printf '%s\n' 'candidate must be a descendant of the project output root' >&2
-      exit 2
-      ;;
-  esac
-
-  relative_root=${candidate_root#"$output_path"/}
-  backup_root="$project_root/.output-render-bind-$(date +%Y%m%d%H%M%S)"
-  bound_root="$backup_root/$relative_root"
-
-  path_present() {
-    test -e "$1" || test -L "$1"
-  }
-
-  restore_output() {
-    # `status` is a read-only shell parameter in zsh; use a portable local
-    # name so the EXIT trap can restore the original output tree under either
-    # zsh or bash.
-    exit_status=$?
-    trap - EXIT INT TERM
-
-    if [ -L "$output_path" ]; then
-      if [ "$(readlink "$output_path")" != "$bound_root" ]; then
-        printf '%s\n' 'refusing to replace an unexpected output symlink' >&2
-        exit 1
-      fi
-      unlink "$output_path"
-    elif path_present "$output_path" && path_present "$backup_root"; then
-      printf '%s\n' 'refusing to overwrite an unexpected output path during restoration' >&2
-      exit 1
-    fi
-
-    if path_present "$backup_root"; then
-      if path_present "$output_path"; then
-        printf '%s\n' 'refusing to restore while output is unexpectedly occupied' >&2
-        exit 1
-      fi
-      mv "$backup_root" "$output_path"
-    elif ! path_present "$output_path"; then
-      printf '%s\n' 'output restoration failed: neither original tree nor backup remains' >&2
-      exit 1
-    fi
-
-    exit "$exit_status"
-  }
-
-  trap restore_output EXIT
-  trap 'exit 130' INT
-  trap 'exit 143' TERM
-
-  test -d "$candidate_root"
-  test -d "$output_path"
-  test ! -L "$output_path"
-  test ! -e "$backup_root"
-  test ! -L "$backup_root"
-  mv "$output_path" "$backup_root"
-  test -d "$bound_root"
-  ln -s "$bound_root" "$output_path"
-  test -L "$output_path"
-  test "$(readlink "$output_path")" = "$bound_root"
-
-  (
-    cd "$AIP_RELEASE_RENDERER_ROOT"
-    uv run python -m infrastructure.orchestration link-projects --dry-run
-    env TEMPLATE_SKIP_LINK_SYNC=1 uv run python scripts/pipeline/stage_03_render.py \
-      --project working/active_inference_power \
-      --skip-manuscript-hydration
-  )
-)
-
-render_candidate_through_template
+./.venv/bin/python scripts/render_manuscript.py --output-root "$isolated_root"
 ```
 
-The function restores the original `output/` tree before it returns whether the
-renderer succeeds, fails, or receives `INT` or `TERM`. The explicit skip is
-essential: otherwise Stage 03 would hydrate the canonical path rather than the
-already validated candidate bundle. After it returns, the rendered files remain
-under `$isolated_root/web/` and `$isolated_root/pdf/`.
+Renderer discovery is explicit: `--renderer-root` takes precedence over
+`AIP_RELEASE_RENDERER_ROOT`, then the command uses the conventional
+`<project-parent>/template` checkout. The selected root must resolve to that
+conventional checkout because the existing provenance capture, release review,
+and finalizer validate it there. An unset environment variable alone does not
+mean the renderer is unavailable.
+
+Before moving anything, the wrapper requires a provisioned, compatible renderer
+source closure, its executable `.venv/bin/python`, a pre-existing
+`projects/working/active_inference_power` symlink resolving to this repository,
+and Pandoc/XeLaTeX on `PATH`. It never installs dependencies, synchronizes links,
+or changes renderer sources. A reference checkout at another location is not
+automatically a compatible controlled renderer; the exact missing prerequisites
+are described in [controlled_renderer.md](controlled_renderer.md).
+
+The candidate must already exist strictly below the real, non-symlink
+`output/` directory and outside the historical campaign namespaces. The wrapper
+runs the existing read-only pre-render release review with `--skip-render
+--skip-clean-install`; that review checks current quality/source witnesses,
+strict resolved variables and render-input hashes, manuscript presentation, and
+the figure registry/accessibility contract. Failed admission leaves the output
+tree unbound; it never generates substitute values or rehydrates the candidate.
+
+The wrapper then invokes the provisioned interpreter directly (without a
+dependency-sync step), with bytecode writes disabled and
+`TEMPLATE_SKIP_LINK_SYNC=1`, using the existing Stage 03 entrypoint:
+
+```text
+scripts/pipeline/stage_03_render.py --project working/active_inference_power --skip-manuscript-hydration
+```
+
+The hydration skip is essential: Stage 03 must consume the already validated
+candidate, not hydrate the canonical path. On normal completion, renderer
+failure, `INT`, or `TERM`, the wrapper stops an interrupted renderer process
+group before restoring its exact binding. It refuses to overwrite an unexpected
+path, preserving the original under `.output-render-bind-*/output` for manual
+recovery instead. An uncatchable termination or host failure can also require
+manual restoration; stop all writers and inspect both paths before recovery.
+After a successful restoration, rendered files remain under
+`$isolated_root/web/` and `$isolated_root/pdf/`. A successful render is not a
+publication-ready or finalized bundle.
 
 Then run the post-render synchronization, audits, review, and finalizer against
 that same candidate:

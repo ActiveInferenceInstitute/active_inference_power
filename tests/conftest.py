@@ -23,6 +23,13 @@ for _path in (str(ROOT), str(SRC)):
         sys.path.insert(0, _path)
 
 
+def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
+    """Keep real bundle consumers in the full lane, using the existing slow marker."""
+    for item in items:
+        if isinstance(item, pytest.Function) and "generated_fast_bundle" in item.fixturenames:
+            item.add_marker(pytest.mark.slow)
+
+
 @pytest.fixture(scope="session")
 def generated_fast_bundle(tmp_path_factory: pytest.TempPathFactory) -> Path:
     """Generate one real, isolated fast evidence bundle for artifact tests.

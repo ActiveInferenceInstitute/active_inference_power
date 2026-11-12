@@ -45,12 +45,31 @@ Run the analysis and quality scripts before hydration. Strict hydration refuses
 to proceed when result or quality artifacts are missing.
 
 After hydration, run the source and resolved-tree checks in
-[the presentation-linter guide](../docs/manuscript_presentation_linter.md),
-then follow the sibling-render and finalization order in
-[the rendering pipeline](../docs/rendering_pipeline.md). Do not edit a
-resolved `output/manuscript/` file to repair a token or value. A prose, figure,
-configuration, or bibliography edit changes render inputs, so hydrate and
-render a fresh candidate before treating a PDF or HTML review as current.
+[the presentation-linter guide](../docs/manuscript_presentation_linter.md).
+Set `isolated_root` to the prepared candidate. The authoritative
+repository-owned rendering command is:
+
+```bash
+./.venv/bin/python scripts/render_manuscript.py --output-root "$isolated_root"
+```
+
+It delegates to the provisioned controlled renderer's Stage 03, checks the
+candidate's existing strict variables and figure registry through the
+read-only pre-render release review, and temporarily binds that candidate
+without installing an engine or changing renderer links. Follow
+[controlled-renderer provisioning](../docs/controlled_renderer.md) and
+[the complete rendering pipeline](../docs/rendering_pipeline.md) for the
+required candidate preparation, post-render audits, review, and finalization.
+Missing renderer provisioning fails closed; neither a reference template
+checkout nor host Pandoc/LaTeX alone supplies a compatible release renderer.
+
+Do not edit a resolved `output/manuscript/` file to repair a token or value.
+Changing numbers remain generated in the selected candidate's
+`data/manuscript_variables.json`; captions, alternative text, and validity
+metadata remain generated in `figures/figure_registry.json`. Do not duplicate
+their numeric contents in this guide or scientific source prose. A prose,
+figure, configuration, or bibliography edit changes render inputs, so hydrate
+and render a fresh candidate before treating a PDF or HTML review as current.
 For an isolated candidate, the presentation audit must receive that candidate's
-explicit `data/manuscript_variables.json` and resolved manuscript directory;
-do not let its default `output/` paths select a different bundle.
+explicit variables file and resolved manuscript directory; do not let its
+default `output/` paths select a different bundle.

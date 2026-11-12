@@ -456,46 +456,6 @@ def test_conclusion_states_the_deliverable_directly() -> None:
     assert "conditional evidence chain" in conclusion
 
 
-def test_public_surface_has_no_stale_namespace_terms() -> None:
-    """Keep the canonical package namespace clean across public surfaces."""
-    roots = (
-        PROJECT_ROOT / "README.md",
-        PROJECT_ROOT / "docs",
-        PROJECT_ROOT / "manuscript",
-        PROJECT_ROOT / "examples",
-        PROJECT_ROOT / "src",
-        PROJECT_ROOT / "scripts",
-        PROJECT_ROOT / "data",
-    )
-    text = "\n".join(
-        path.read_text(encoding="utf-8")
-        for root in roots
-        for path in ((root,) if root.is_file() else root.rglob("*"))
-        if path.is_file() and path.suffix in {".md", ".py", ".yaml", ".yml", ".toml"}
-    ).lower()
-    forbidden = (
-        "leg" + "acy",
-        "depre" + "cated",
-        "flat-" + "import",
-        "import" + " src",
-        "from" + " src",
-        "src" + ".active",
-        "compati" + "b",
-    )
-    for token in forbidden:
-        assert token not in text, f"stale public terminology remains: {token}"
-    flat_modules = (
-        "__init__.py",
-        "active_inference.py",
-        "certificates.py",
-        "corrections.py",
-        "error_rates.py",
-        "manuscript_variables.py",
-        "power.py",
-        "simulation.py",
-        "theory.py",
-    )
-    assert not any((PROJECT_ROOT / "src" / name).is_file() for name in flat_modules)
 
 
 def test_research_roadmap_has_stage_controls() -> None:

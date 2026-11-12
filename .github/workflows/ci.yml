@@ -26,17 +26,31 @@ jobs:
         with:
           version: "0.13.6"
           python-version: ${{ matrix.python-version }}
-      - run: uv lock --check
       - run: uv sync --locked --extra dev
-      - run: uv run --extra dev python -m compileall -q src scripts tests examples
-      - run: uv run --extra dev ruff check src scripts tests examples
-      - run: uv run --extra dev mypy src scripts tests examples --ignore-missing-imports
-      - run: uv run --extra dev python -m pytest tests/ --cov=active_inference_power --cov-branch --cov-fail-under=95 -q
-      - run: uv build --out-dir /tmp/active-inference-power-wheel
-      - run: uv run python -c "import active_inference_power; print(active_inference_power.__name__)"
-      - run: uv venv /tmp/active-inference-power-clean-venv
-      - run: uv pip install --python /tmp/active-inference-power-clean-venv/bin/python /tmp/active-inference-power-wheel/*.whl
-      - run: /tmp/active-inference-power-clean-venv/bin/python -c "import active_inference_power; print(active_inference_power.PowerScenario.__name__)"
+      - name: Check lock and static gates once in the shared 3.14 environment
+        if: matrix.python-version == '3.14'
+        run: |
+          uv lock --check
+          ./run.sh lint types docs package
+      # The 3.14 lane produces the fast bundle before the quality gate, then
+      # reuses that gate's quality.json. No second full pytest invocation.
+      - name: Produce fast bundle
+        if: matrix.python-version == '3.14'
+        run: .venv/bin/python scripts/generate_results.py --profile fast --workers 2 --checkpoint-every 500
+      - run: ./run.sh test-full
+      - name: Hydrate and audit the fast bundle (not a release render)
+        if: matrix.python-version == '3.14'
+        run: |
+          set -euo pipefail
+          .venv/bin/python scripts/z_generate_manuscript_variables.py
+          .venv/bin/python scripts/audit_manuscript_presentation.py --resolved-manuscript-dir output/manuscript
+          .venv/bin/python scripts/audit_figure_accessibility.py --output-root output
+          .venv/bin/python scripts/audit_fast_bundle.py --output-root output
+          .venv/bin/python examples/01_reference_power.py --profile fast --output-root output/examples-ci
+          .venv/bin/python examples/02_environment_control.py --profile fast --output-root output/examples-ci
+          .venv/bin/python examples/03_adaptive_target_selection.py --profile fast --output-root output/examples-ci
+          .venv/bin/python -c 'import json; assert json.load(open("output/manifest.json"))["complete"] is False'
+          .venv/bin/python -c 'from pathlib import Path; assert not any("{{" in p.read_text() for p in Path("output/manuscript").glob("*.md"))'
 
   gnn-conformance:
     timeout-minutes: 120
@@ -68,9 +82,7 @@ jobs:
       - name: Validate the GNN specifications against the pinned parser
         env:
           ACTIVE_INFERENCE_POWER_GNN_ROOT: ${{ github.workspace }}/../Generalized_Notation_Notation
-        run: |
-          uv run --extra dev python scripts/validate_gnn_specs.py
-          uv run --extra dev pytest tests/test_gnn_specs.py -q
+        run: ./run.sh gnn
 
       - name: Report the resolved GNN version
         run: |
@@ -80,28 +92,3 @@ jobs:
           TAG=$(python3 -c "import json;print(json.load(open('$PIN'))['tag'])")
           test "$VERSION" = "${TAG#v}"
           echo "gnn-version=${VERSION}" >> "$GITHUB_STEP_SUMMARY"
-  fast-artifacts:
-    timeout-minutes: 120
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
-        with:
-          version: "0.13.6"
-          python-version: "3.14"
-      - run: uv sync --locked --extra dev
-      - run: uv run python scripts/generate_results.py --profile fast --workers 2 --checkpoint-every 500
-      - run: uv run python scripts/generate_quality_report.py
-      - run: uv run python scripts/z_generate_manuscript_variables.py
-      - run: uv run python scripts/audit_documentation_links.py
-      - run: uv run python scripts/audit_manuscript_presentation.py --resolved-manuscript-dir output/manuscript
-      - run: uv run python scripts/audit_figure_accessibility.py --output-root output
-      # A clean CI checkout has no sibling template renderer. This checks the
-      # source-bound fast bundle without mislabeling it as a release review.
-      - run: uv run python scripts/audit_fast_bundle.py --output-root output
-      - run: uv run python examples/01_reference_power.py --profile fast --output-root output/examples-ci
-      - run: uv run python examples/02_environment_control.py --profile fast --output-root output/examples-ci
-      - run: uv run python examples/03_adaptive_target_selection.py --profile fast --output-root output/examples-ci
-      - run: test "$(uv run python -c 'import json; print(json.load(open("output/manifest.json"))["complete"])')" = "False"
-      - run: test -z "$(rg '\{\{' output/manuscript || true)"

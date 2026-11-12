@@ -1,9 +1,16 @@
 # Documentation hub
 
+**Quick navigation:** [flat documentation index](documentation-index.md) |
+[gate run guide](RUN_GUIDE.md) |
+[pinned GNN conformance](../.github/GNN.md) |
+[generated gate runtime evidence](_generated/gate-runtimes.md).
+
 ## Choose a reading path
 
 - **First local run:** prepare the locked environment and make a disposable
   smoke bundle in [quickstart.md](quickstart.md).
+- **Source checks:** use the shared local/CI interface in the
+  [gate run guide](RUN_GUIDE.md); its fast path is not a release coverage claim.
 - **Methods reader:** start with the
   [evaluation perspective](evaluation_perspective.md), then the
   [action-in-the-loop contract](action_in_the_loop.md),
@@ -25,6 +32,10 @@
 
 | Document | Purpose |
 |---|---|
+| [documentation-index.md](documentation-index.md) | Flat inventory of long-lived documentation, manuscript sources, and directory guides |
+| [RUN_GUIDE.md](RUN_GUIDE.md) | Composable local and CI gates, locked environment, and evidence boundaries |
+| [_generated/gate-runtimes.md](_generated/gate-runtimes.md) | Generated, host-specific before/after gate measurements |
+| [../.github/GNN.md](../.github/GNN.md) | Pinned GNN workflow job and explicit offline checkout contract |
 | [agent_instructions.md](agent_instructions.md) | Project operating contract |
 | [PACKAGE_CONTRACT.md](PACKAGE_CONTRACT.md) | API and mathematical invariants |
 | [architecture.md](architecture.md) | Source → artifact dependency graph |
@@ -57,5 +68,6 @@
 | [faq.md](faq.md) | Scientific and operational questions |
 | [AGENTS.md](AGENTS.md) | Documentation conventions for maintainers and agents |
 
-Run `./.venv/bin/python scripts/audit_documentation_links.py` after changing
-navigation or local Markdown destinations.
+Use `./run.sh docs` after changing navigation or local Markdown destinations.
+It checks documentation links and generated gate documentation; changing
+measurements belong in the generated evidence, never copied into this hub.

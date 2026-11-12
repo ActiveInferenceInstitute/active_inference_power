@@ -18,12 +18,12 @@ Read this file before modifying the project.
 Required source/test gates:
 
 ```bash
-./.venv/bin/python -m compileall -q src scripts tests examples
-./.venv/bin/ruff check src scripts tests examples
-./.venv/bin/python -m pytest tests/ --cov=active_inference_power --cov-branch --cov-fail-under=95
-env -u VIRTUAL_ENV uv run mypy src scripts tests examples --ignore-missing-imports
-./.venv/bin/python scripts/validate_gnn_specs.py
+./run.sh fast
+./run.sh all
 ```
+
+The [gate run guide](RUN_GUIDE.md) defines the separately runnable arms and
+their CI mapping; commands live only in the shared dispatcher.
 
 For a release candidate, pass the same new `--output-root` to result generation,
 manuscript hydration, the manuscript and figure audits, both release reviews,
