@@ -91,12 +91,12 @@ nor marks a bundle complete, so it remains distinct from a release candidate.
 Validate source changes with:
 
 ```bash
-./.venv/bin/python -m compileall -q src scripts tests examples
-./.venv/bin/ruff check src scripts tests examples
-./.venv/bin/python -m pytest tests/ --cov=active_inference_power --cov-branch --cov-fail-under=95
-env -u VIRTUAL_ENV uv run mypy src scripts tests examples --ignore-missing-imports
-./.venv/bin/python scripts/validate_gnn_specs.py
+./run.sh fast
+./run.sh all
 ```
+
+See the [gate run guide](docs/RUN_GUIDE.md) for separately runnable arms,
+their shared CI commands, and generated before/after timing evidence.
 
 At the selected output root, analysis writes `results.json`, `certificates.json`,
 the configured publication PNGs plus `figures/figure_registry.json`,
@@ -220,6 +220,16 @@ reproduces results, figures, and the hydrated manuscript; the immutable
 release PDF and accessible HTML are distributed as release assets. See
 [the controlled-renderer boundary](docs/controlled_renderer.md) and the
 maintainer [rendering pipeline](docs/rendering_pipeline.md).
+
+Maintainers invoke the existing controlled renderer through the authoritative
+project wrapper:
+
+```bash
+./.venv/bin/python scripts/render_manuscript.py --output-root "$isolated_root"
+```
+
+It requires a pre-provisioned compatible renderer and project link; it does
+not install, copy, or replace that engine.
 
 ## Publication and citation
 

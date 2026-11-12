@@ -63,12 +63,13 @@ Read the closest applicable guide in addition to this root contract:
 ## Standard source loop
 
 ```bash
-./.venv/bin/python -m compileall -q src scripts tests examples
-./.venv/bin/ruff check src scripts tests examples
-./.venv/bin/python -m pytest tests/ --cov=active_inference_power --cov-branch --cov-fail-under=95
-env -u VIRTUAL_ENV uv run mypy src scripts tests examples --ignore-missing-imports
-./.venv/bin/python scripts/validate_gnn_specs.py
+./run.sh fast
+./run.sh all
 ```
+
+The [gate run guide](docs/RUN_GUIDE.md) maps separately runnable arms to CI.
+`fast` uses the existing `not slow` selector without release-coverage claims;
+`all` includes the full quality gate and pinned GNN conformance.
 
 For a source-bound candidate, use the complete recipe in
 `docs/agent_instructions.md` or `docs/rendering_pipeline.md`: result generation

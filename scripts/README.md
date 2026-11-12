@@ -2,6 +2,18 @@
 
 Scripts are thin command-line orchestrators:
 
+- `gate.py` is the shared gate dispatcher behind the public `./run.sh`
+  interface. It owns leaf commands and aggregate composition for local and CI
+  source checks; use the [run guide](../docs/RUN_GUIDE.md), rather than copying
+  its command table into another script or workflow;
+- `measure_gates.py` records bounded before/after gate executions and produces
+  the checked [gate runtime evidence](../docs/_generated/gate-runtimes.md)
+  and its machine-readable companion. These host-specific measurements are
+  not scientific results, release coverage receipts, or speed guarantees;
+- `render_manuscript.py --output-root <bundle-root>` is the authoritative thin
+  delegate to the provisioned controlled Stage 03 renderer. It validates the
+  candidate, preserves the original output binding, and refuses missing renderer
+  provisioning; it never copies an engine, creates project links, or hydrates;
 - `generate_results.py` loads YAML, calls `active_inference_power`, and writes results/figures;
   `--profile fast|release|campaign|benchmark|publication`, `--workers`, `--resume`,
   `--checkpoint-every`, `--output-root`, and `--seed` control reproducible
@@ -104,6 +116,7 @@ and tested independently. Support modules such as `artifacts.py`,
 `checkpointing.py`, `release_provenance.py`, and `run_ledger.py` are imported
 by the public producers; do not invoke them as alternate release paths.
 
-See [release review](../docs/release_review.md),
+See the [gate run guide](../docs/RUN_GUIDE.md),
+[release review](../docs/release_review.md),
 [figure accessibility](../docs/figure_accessibility.md), and the
 [documentation hub](../docs/README.md) for the public command contracts.

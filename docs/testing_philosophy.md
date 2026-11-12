@@ -7,9 +7,16 @@ would test interaction shape rather than mathematical output.
 The gate is:
 
 ```bash
-./.venv/bin/python -m pytest tests/ --cov=active_inference_power --cov-branch --cov-fail-under=95
-env -u VIRTUAL_ENV uv run mypy src scripts tests examples --ignore-missing-imports
+./run.sh test-full
+./run.sh types
 ```
+
+Use `./run.sh test-fast` for the existing `not slow` selection without a
+release-coverage claim. See the [gate run guide](RUN_GUIDE.md).
+
+Tests consuming the session-scoped `generated_fast_bundle` fixture (including
+indirect fixture dependencies) are marked `slow` during collection. They stay
+in the unfiltered full suite; default feedback never generates that bundle.
 
 Coverage must be accompanied by a non-zero collection count and a successful
 quality snapshot. Add property tests for invariants (permutation equivariance,

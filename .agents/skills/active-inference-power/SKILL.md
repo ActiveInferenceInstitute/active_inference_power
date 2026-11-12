@@ -14,11 +14,12 @@ Use this skill when changing the package, experiment, figures, or manuscript.
 ## Quick reference
 
 ```bash
-./.venv/bin/python -m compileall -q src scripts tests examples
-./.venv/bin/ruff check src scripts tests examples
-./.venv/bin/python -m pytest tests/ --cov=active_inference_power --cov-branch --cov-fail-under=95
-env -u VIRTUAL_ENV uv run mypy src scripts tests examples --ignore-missing-imports
+./run.sh fast
+./run.sh all
 ```
+
+See [the gate run guide](../../../docs/RUN_GUIDE.md) for individual arms;
+CI calls the same dispatcher. The fast selection is not release-quality evidence.
 
 For an isolated release candidate, follow the complete documented sequence in
 [`docs/agent_instructions.md`](../../../docs/agent_instructions.md): result
