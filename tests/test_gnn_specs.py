@@ -61,6 +61,21 @@ SHIPPED_SPECS = sorted((ROOT / SPEC_DIRNAME).glob("*.gnn.md"))
 CANONICAL_TAG = "v5.0.3"
 CANONICAL_COMMIT = "8f293d9ba810e6eda5c09842d9c7ed9ffa5f92c1"
 
+#: Normative required sections of the GNN v1 compliance contract
+#: (``gnn.schemas.section_contract.REQUIRED_SECTIONS``); the pinned upstream
+#: checker enforces them, so the shipped specs must carry all of them.
+REQUIRED_SPEC_SECTIONS = (
+    "GNNSection",
+    "GNNVersionAndFlags",
+    "ModelName",
+    "ModelAnnotation",
+    "StateSpaceBlock",
+    "Connections",
+    "InitialParameterization",
+    "Time",
+    "Footer",
+)
+
 
 @dataclass(frozen=True)
 class UpstreamRun:
@@ -248,6 +263,27 @@ def test_shipped_specs_parse_and_bind_to_the_runtime_models() -> None:
     assert rows["sequential_evidence_agent"]["ontology_terms"] == 8
 
 
+@pytest.mark.parametrize("spec", SHIPPED_SPECS, ids=lambda path: path.name)
+def test_shipped_specs_carry_every_required_section(spec: Path) -> None:
+    """A spec missing a normative section fails the pinned compliance gate."""
+    headings = {
+        line[3:].strip()
+        for line in spec.read_text(encoding="utf-8").splitlines()
+        if line.startswith("## ")
+    }
+    assert set(REQUIRED_SPEC_SECTIONS) - headings == set()
+
+
+@pytest.mark.parametrize("spec", SHIPPED_SPECS, ids=lambda path: path.name)
+def test_every_connection_endpoint_is_a_declared_variable(spec: Path) -> None:
+    """An edge names declared variables; its ``:annotation`` is only a label."""
+    parsed = parse_spec(spec.read_text(encoding="utf-8"), source=str(spec))
+    endpoints = {edge.source for edge in parsed.connections} | {
+        edge.target for edge in parsed.connections
+    }
+    assert sorted(endpoints - set(parsed.variables)) == []
+
+
 def test_sequential_agent_spec_declares_the_runtime_matrices() -> None:
     """The sequential spec's declared arrays reproduce the real generative model."""
     spec = parse_spec((ROOT / SPEC_DIRNAME / "sequential_evidence_agent.gnn.md").read_text(encoding="utf-8"))
@@ -262,7 +298,7 @@ def test_sequential_agent_spec_declares_the_runtime_matrices() -> None:
     assert binding_issues(spec, runtime) == []
     assert spec.ontology["s"] == "HiddenState"
     assert spec.model_parameters["posterior_threshold"] == "0.9"
-    assert spec.connections[0].source == "D" and spec.connections[0].label == "prior_initialization"
+    assert spec.connections[0].source == "D" and spec.connections[0].target == "s"
 
 
 def test_reference_action_loop_spec_declares_the_runtime_shapes() -> None:
