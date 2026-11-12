@@ -2023,7 +2023,7 @@ def run(
                 "active_inference_reps": active_reps,
                 "figure_error_multiplier": float(experiment.get("figure_error_multiplier", 3.0)),
                 "figure_dpi": int(experiment.get("figure_dpi", 300)),
-                "pymdp_version": str(experiment.get("pymdp_version", "1.0.3")),
+                "pymdp_version": str(experiment.get("pymdp_version", "1.0.5")),
                 "profile": selected_profile,
                 "stage_seed_schedule": stage_seeds,
                 "certificate_gate": certificate_gate,
