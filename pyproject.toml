@@ -76,6 +76,13 @@ exclude_lines = [
     "raise NotImplementedError",
 ]
 
+[tool.ruff.lint]
+# ruff 0.17 replaced the classic E4/E7/E9/F default set with roughly 400 rules.
+# State the policy this repository is written against explicitly so a linter
+# release cannot silently turn the gate red; adopting the wider set is its own
+# migration, not part of a dependency bump.
+select = ["E4", "E7", "E9", "F"]
+
 [tool.mypy]
 # External scientific runtimes do not currently ship complete PEP 561 stubs in
 # the supported environment. Source contracts remain checked while those
