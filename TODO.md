@@ -52,7 +52,7 @@ hash-linked, source-bound release bundle recorded below.
 
 | ID | Open scope | Evidence and boundary |
 |---|---|---|
-| M6 | The frozen manuscript metadata declares `pymdp_version: "1.0.3"` in `manuscript/config.yaml` and `manuscript/config.yaml.example`, while the package pin in `pyproject.toml` is `inferactively-pymdp==1.0.5` (resolved to 1.0.5 in `uv.lock`). The 1.0.3 value is the v1.0.0 release's recorded dependency version. The manuscript files are frozen release evidence and are not edited by this pass. A future source-contract refresh should decide whether to re-record the manuscript variable to the current pin or keep the release version and state that scope explicitly. | `manuscript/config.yaml` and `manuscript/config.yaml.example` (frozen), `scripts/generate_results.py:2026` (the `pymdp_version` fallback default), and `pyproject.toml` (current pin). The live `README.md` description states `==1.0.5`; the frozen manuscript metadata remains at 1.0.3. |
+| M6 | The frozen manuscript metadata still declares `pymdp_version: "1.0.3"` in `manuscript/config.yaml` and `manuscript/config.yaml.example`, while the package pin in `pyproject.toml` is `inferactively-pymdp==1.0.5`, advanced from `1.0.4` in #23 without touching the manuscript. The 1.0.3 value is the v1.0.0 release's recorded dependency version. Because both manuscript files declare the key explicitly, the `1.0.5` default at `scripts/generate_results.py:2026` does not apply to this configuration, so a freshly generated `meta.pymdp_version` — and with it the `CONFIG_PYMDP_VERSION` manuscript variable — would state 1.0.3 while 1.0.5 is installed. The manuscript files are frozen release evidence and are not edited by this pass. Open decision for the release owner (Daniel Ari Friedman): at the next source-contract refresh, either re-record both manuscript files to the current pin, or keep 1.0.3 and state in the manuscript scope that the value is the v1.0.0 release's dependency record rather than the installed pin. Nothing outside this repository blocks it; it is deferred only because it must be settled before the release chain runs again, not after. | `manuscript/config.yaml:127` and `manuscript/config.yaml.example:64` (frozen), `scripts/generate_results.py:2026` (the `pymdp_version` fallback default, now `1.0.5`), `src/active_inference_power/manuscript_variables.py:857` (the `CONFIG_PYMDP_VERSION` binding), and `pyproject.toml` (pin `inferactively-pymdp==1.0.5`). `README.md:29` and `domain_profile.yaml` already state the 1.0.5 pin; only the frozen manuscript metadata remains at 1.0.3. |
 
 ## Completed minor — maintenance and reader-facing quality
 
@@ -67,6 +67,7 @@ future work.
 | M3 | Complete — project-root release-path cross-links for quickstart, FAQ, examples, offline benchmarks, and the failure-safe campaign workflow. | `scripts/audit_documentation_links.py`, `tests/test_documentation_links.py`, and the documentation hub. |
 | M4 | Complete — browser-free demo smoke lane validating a committed payload, visible trace, configuration hash, and trace hashes. | `scripts/smoke_demo.py`, `tests/test_demo_smoke.py`, and `tests/fixtures/demo_payload.json`. |
 | M5 | Complete — figure accessibility audit for dimensions, redundant encoding, estimand, uncertainty, sample size, evidence class, and validity boundary. | `scripts/audit_figure_accessibility.py`, `tests/test_figure_accessibility.py`, and `docs/figure_accessibility.md`. |
+| M7 | Complete — adopted the estate's single GNN importer reader on custody pin `v5.1.0` and deleted the interim local pin reader (`active_inference_power.gnn_specs.load_upstream_pin`) plus its pin-shape tests, so reading a pin, validating it against its `.github/GNN.md` pointer, and validating specification syntax each have one home again. | `models/gnn-pin.json` (schema `gnn-importer-pin/v1`, tag `v5.1.0`, commit `75c834bd8519dc7b5adc4d24f16bf393cfd1ecdf`), `.github/GNN.md`, `docs/RUN_GUIDE.md`, `scripts/gnn_importer_check.py`, `scripts/validate_gnn_specs.py`, and `tests/test_gnn_specs.py`; merged as #22 (`97f2388`). Custody plumbing only: it promotes no claim and adds no estimand. The `gnn` arm now runs `python -m gnn.importers check --repo .` against the pinned revision, and the two member checks (runtime binding and pinned-parser digest equality) remain. |
 
 ## Completed medium — bounded research extensions
 
@@ -101,8 +102,8 @@ execution and a fail-closed output namespace.
 
 ## Ordering
 
-1. Retain M1–M5 as required gates so future changes fail early at the
-   presentation and artifact boundaries.
+1. Retain M1–M5 and M7 as required gates so future changes fail early at the
+   presentation, custody-pin, and artifact boundaries.
 2. Retain the completed G1 review and R1–R6/G3/G4/G5 receipts as isolated,
    non-promoted evidence; rerun them only through their declared generators
    when a source or configuration change requires it.
