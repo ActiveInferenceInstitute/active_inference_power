@@ -14,8 +14,10 @@ The agent "rejects H0" iff its final posterior belief in ``H1`` reaches the
 configured ``threshold``.
 
 The implementation uses the installed ``pymdp.agent.Agent`` interface from
-``inferactively-pymdp==1.0.5``. The project's public API is independent of
-that dependency namespace.
+``inferactively-pymdp==1.0.5``. The live pin is ``inferactively-pymdp==1.0.5``
+(``pyproject.toml`` and ``uv.lock``); the frozen v1.0.0 manuscript metadata
+(``manuscript/config.yaml``) still records 1.0.3 as dated release evidence. The
+project's public API is independent of that dependency namespace.
 
 Closed form (used as the correctness oracle in the tests). With prior odds
 ``o0 = prior_signal / (1 - prior_signal)`` and per-observation likelihood ratio
