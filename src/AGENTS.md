@@ -24,10 +24,12 @@ here; scripts own command-line parsing, paths, subprocesses, and rendering.
 - Prefer seeded NumPy/SciPy/pymdp computations; reject malformed or
   non-finite inputs rather than coercing them silently.
 - Keep the GNN specifications bound to the runtime models: `gnn_specs.py` owns
-  the specification reader, the runtime-shape/value binding, and the
-  pinned-upstream digest comparison. A model change that alters a declared
-  matrix updates the matching `models/*.gnn.md` specification in the same
-  change; numeric values stay owned by the runtime contracts.
+  the project specification parser, the runtime-shape/value binding, and the
+  pinned-upstream digest comparison. The custody pin is read by upstream
+  `gnn.importers`, which the `gnn` arm runs; do not re-implement it here.
+  A model change that alters a declared matrix updates the matching
+  `models/*.gnn.md` specification in the same change; numeric values stay owned
+  by the runtime contracts.
 
 Run the focused tests for a changed module, then the project test, type, and
 lint gates from the repository root.

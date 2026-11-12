@@ -9,20 +9,29 @@ declared state space, connections, ontology annotations, and any declared
 ``InitialParameterization`` agree with the runtime model.
 
 ``models/gnn-pin.json`` records the pinned Generalized_Notation_Notation
-release the specifications are checked against. Nothing here imports upstream
-GNN code: :data:`DIGEST_DRIVER_SOURCE` is a stdlib-only program the conformance
-test runs with the pinned checkout's own interpreter, with the pinned commit's
-``src/gnn`` extracted onto ``PYTHONPATH`` — so the bytes under test are the
-pinned release's bytes, not the live working tree's.
+release the specifications are checked against. The pin is *read* by
+``gnn.importers``, the estate's single reader: the ``gnn`` gate arm runs
+``python -m gnn.importers check --repo .`` against the pinned revision, and this
+module no longer validates a pin shape of its own. :func:`pinned_revision`
+selects only the revision and parser entry point the conformance checks must
+materialize.
+
+Nothing here imports upstream GNN code: :data:`DIGEST_DRIVER_SOURCE` is a
+stdlib-only program the conformance test runs with the pinned checkout's own
+interpreter, with the pinned commit's ``src/gnn`` extracted onto ``PYTHONPATH``
+by :func:`extract_pinned_src` — so the bytes under test are the pinned
+release's bytes, not the live working tree's.
 """
 
 from __future__ import annotations
 
 import ast
-import datetime
+import io
 import json
 import os
 import re
+import subprocess
+import tarfile
 from collections import Counter
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
@@ -52,23 +61,15 @@ _DECL_RE = re.compile(r"^(?P<name>[^\s\[]+)\[(?P<body>[^\]]*)\]\s*(?:#\s*(?P<com
 _EDGE_RE = re.compile(r"^(?P<src>[^\s>\-]+)\s*(?P<op>[>\-])\s*(?P<dst>[^\s:>\-]+)(?::(?P<label>[\w]+))?$")
 _PARAM_BLOCK_RE = re.compile(r"([^\s=]+)\s*=\s*\{")
 
-_CORE_PIN_KEYS = ("repository", "commit", "version", "date_recorded")
-_OPTIONAL_PIN_KEYS = ("tag", "parser_module", "parser_class")
-_TAG_RE = re.compile(r"v\d+\.\d+\.\d+")
-_VERSION_RE = re.compile(r"\d+\.\d+\.\d+")
-_DATE_RE = re.compile(r"\d{4}-\d{2}-\d{2}")
-_COMMIT_RE = re.compile(r"[0-9a-f]{40}")
-_MODULE_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)+")
-_CLASS_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 _DTYPE_ALIASES = {"integer": "int", "boolean": "bool", "string": "str"}
 
 
 class GnnSpecError(ValueError):
-    """Raised when a shipped GNN specification or custody pin is unusable."""
+    """Raised when a shipped GNN specification is unusable."""
 
 
-class UpstreamPinError(ValueError):
-    """Raised when the pinned upstream release identity is malformed or unusable."""
+class UpstreamInputError(ValueError):
+    """Raised when the selected upstream checkout or its payload is unusable."""
 
 
 @dataclass(frozen=True)
@@ -106,94 +107,84 @@ class GnnSpec:
 
 
 @dataclass(frozen=True)
-class UpstreamPin:
-    """The pinned upstream GNN release the specifications are checked against.
+class PinnedRevision:
+    """The pinned revision the conformance checks materialize.
 
-    ``repository``, ``commit``, ``version``, and ``date_recorded`` are the core
-    identity every consumer declares. ``tag`` and the parser entry point are
-    optional convenience fields validated when present, and any other key is
-    carried in :attr:`extras` rather than refused, so a consumer can add digest
-    maps or checkout hints without forking the schema.
+    Only the fields a caller needs to run the pinned parser are selected here:
+    ``commit`` names the bytes to extract and the parser entry point names the
+    class to execute. The pin's shape, its tag/version agreement, the pointer
+    and the specifications' upstream syntax are ``gnn.importers``' findings —
+    this repository does not validate a pin.
     """
 
-    repository: str
     commit: str
-    version: str
-    date_recorded: str
-    tag: str | None = None
-    parser_module: str | None = None
-    parser_class: str | None = None
-    extras: Mapping[str, object] = field(default_factory=dict)
-
-    def parser_entry_point(self) -> tuple[str, str]:
-        """Return the pinned parser module and class, or raise when undeclared."""
-        if not self.parser_module or not self.parser_class:
-            raise UpstreamPinError("upstream pin does not declare a parser entry point")
-        return self.parser_module, self.parser_class
+    parser_module: str
+    parser_class: str
 
 
-def load_upstream_pin(path: Path) -> UpstreamPin:
-    """Read and validate the pinned upstream GNN release identity.
+def pinned_revision(project_root: Path) -> PinnedRevision:
+    """Select the pinned revision and parser entry point to materialize.
+
+    This is a selection read, not a pin reader: it takes the three fields the
+    conformance checks need and refuses a pin that omits them. Everything the
+    pin is *validated* for lives in ``gnn.importers``, which the ``gnn`` arm
+    runs as ``python -m gnn.importers check --repo .``.
 
     Raises:
-        UpstreamPinError: on an unreadable, ambiguous, or malformed pin.
+        UpstreamInputError: the pin is unreadable or omits a needed field.
     """
-
-    def unique(pairs: list[tuple[str, object]]) -> dict[str, object]:
-        result: dict[str, object] = {}
-        for key, value in pairs:
-            if key in result:
-                raise UpstreamPinError(f"duplicate upstream pin field: {key}")
-            result[key] = value
-        return result
-
+    path = Path(project_root) / PIN_RELATIVE_PATH
     try:
-        data = json.loads(Path(path).read_text(encoding="utf-8"), object_pairs_hook=unique)
+        data = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError) as exc:
-        raise UpstreamPinError(f"cannot read upstream pin {path}: {exc}") from exc
+        raise UpstreamInputError(f"cannot read the pinned revision {path}: {exc}") from exc
+    required = ("commit", "parser_module", "parser_class")
     if not isinstance(data, dict):
-        raise UpstreamPinError("upstream pin must be a JSON object")
-    missing = [key for key in _CORE_PIN_KEYS if key not in data]
+        raise UpstreamInputError(f"the pin {path} must be a JSON object")
+    missing = [
+        key
+        for key in required
+        if not isinstance(data.get(key), str) or not str(data[key]).strip()
+    ]
     if missing:
-        raise UpstreamPinError(
-            f"upstream pin must declare {list(_CORE_PIN_KEYS)}; missing {missing}"
-        )
-    declared = {key: data[key] for key in (*_CORE_PIN_KEYS, *_OPTIONAL_PIN_KEYS) if key in data}
-    if not all(isinstance(value, str) for value in declared.values()):
-        raise UpstreamPinError("upstream pin fields must be strings")
-    if not str(data["repository"]).startswith("https://github.com/"):
-        raise UpstreamPinError("upstream repository must be an HTTPS GitHub URL")
-    if not _COMMIT_RE.fullmatch(str(data["commit"])):
-        raise UpstreamPinError("upstream commit must be a complete Git object identity")
-    if not _VERSION_RE.fullmatch(str(data["version"])):
-        raise UpstreamPinError("upstream version must be a release version (major.minor.patch)")
-    try:
-        datetime.date.fromisoformat(str(data["date_recorded"]))
-    except ValueError as exc:
-        raise UpstreamPinError("upstream date_recorded must be an ISO date (YYYY-MM-DD)") from exc
-    tag = data.get("tag")
-    if tag is not None:
-        if not _TAG_RE.fullmatch(str(tag)):
-            raise UpstreamPinError("upstream tag must name a stable version (v<major>.<minor>.<patch>)")
-        if str(tag).removeprefix("v") != str(data["version"]):
-            raise UpstreamPinError("upstream tag and version must name the same release")
-    parser_module = data.get("parser_module")
-    if parser_module is not None and not _MODULE_RE.fullmatch(str(parser_module)):
-        raise UpstreamPinError("upstream parser_module must be a dotted import path")
-    parser_class = data.get("parser_class")
-    if parser_class is not None and not _CLASS_RE.fullmatch(str(parser_class)):
-        raise UpstreamPinError("upstream parser_class must be a Python identifier")
-    extras = {key: value for key, value in data.items() if key not in declared}
-    return UpstreamPin(
-        repository=str(data["repository"]),
-        commit=str(data["commit"]),
-        version=str(data["version"]),
-        date_recorded=str(data["date_recorded"]),
-        tag=None if tag is None else str(tag),
-        parser_module=None if parser_module is None else str(parser_module),
-        parser_class=None if parser_class is None else str(parser_class),
-        extras=extras,
+        raise UpstreamInputError(f"the pin {path} must declare {list(missing)} as strings")
+    return PinnedRevision(
+        commit=str(data["commit"]).strip(),
+        parser_module=str(data["parser_module"]).strip(),
+        parser_class=str(data["parser_class"]).strip(),
     )
+
+
+def extract_pinned_src(root: Path, commit: str, destination: Path) -> Path:
+    """Extract a pinned commit's ``src/gnn`` from Git; return its ``src`` directory.
+
+    The checkout is treated as read-only (``git cat-file`` / ``git archive``
+    only), so the reader and parser executed against the shipped
+    specifications are the pinned release's bytes rather than the checkout's
+    live working tree.
+
+    Raises:
+        UpstreamInputError: the commit is absent from the checkout.
+        subprocess.CalledProcessError: Git cannot archive the commit.
+    """
+    presence = subprocess.run(
+        ("git", "-C", str(root), "cat-file", "-e", f"{commit}^{{commit}}"),
+        capture_output=True,
+        text=True,
+    )
+    if presence.returncode != 0:
+        raise UpstreamInputError(
+            f"pinned commit {commit} is not present in {root}; fetch the pinned release "
+            "before running the conformance checks"
+        )
+    archive = subprocess.run(
+        ("git", "-C", str(root), "archive", commit, "src/gnn"),
+        check=True,
+        capture_output=True,
+    )
+    with tarfile.open(fileobj=io.BytesIO(archive.stdout)) as stream:
+        stream.extractall(destination, filter="data")
+    return Path(destination) / "src"
 
 
 def default_gnn_root(project_root: Path) -> Path:
@@ -208,13 +199,13 @@ def resolve_gnn_root(project_root: Path, env: Mapping[str, str] | None = None) -
     of an empty value; otherwise the conventional sibling checkout is used.
 
     Raises:
-        UpstreamPinError: if the environment selection is set but empty.
+        UpstreamInputError: if the environment selection is set but empty.
     """
     environ = os.environ if env is None else env
     if ENV_UPSTREAM_ROOT in environ:
         raw = environ[ENV_UPSTREAM_ROOT].strip()
         if not raw:
-            raise UpstreamPinError(f"{ENV_UPSTREAM_ROOT} must not be empty")
+            raise UpstreamInputError(f"{ENV_UPSTREAM_ROOT} must not be empty")
         return Path(raw).expanduser().resolve()
     return default_gnn_root(project_root)
 
@@ -491,7 +482,7 @@ def normalize_upstream_digest(payload: Mapping[str, object]) -> dict[str, object
     """Normalize the upstream driver's JSON digest into the project digest shape.
 
     Raises:
-        UpstreamPinError: if the payload is missing required digest fields.
+        UpstreamInputError: if the payload is missing required digest fields.
     """
     required = (
         "model_name",
@@ -505,21 +496,21 @@ def normalize_upstream_digest(payload: Mapping[str, object]) -> dict[str, object
     )
     missing = [key for key in required if key not in payload]
     if missing:
-        raise UpstreamPinError(f"upstream digest is missing fields: {missing}")
+        raise UpstreamInputError(f"upstream digest is missing fields: {missing}")
 
     raw_variables = payload["variables"]
     if not isinstance(raw_variables, Sequence):
-        raise UpstreamPinError("upstream digest 'variables' must be a sequence")
+        raise UpstreamInputError("upstream digest 'variables' must be a sequence")
     variables: dict[str, object] = {}
     for entry in raw_variables:
         if not isinstance(entry, Mapping):
-            raise UpstreamPinError("upstream digest variable entries must be mappings")
+            raise UpstreamInputError("upstream digest variable entries must be mappings")
         name = str(entry["name"])
         variables[name] = {"dims": [int(dim) for dim in entry["dims"]], "dtype": _normalize_dtype(entry["dtype"])}
 
     raw_connections = payload["connections"]
     if not isinstance(raw_connections, Sequence):
-        raise UpstreamPinError("upstream digest 'connections' must be a sequence")
+        raise UpstreamInputError("upstream digest 'connections' must be a sequence")
     connections = sorted(
         [str(edge[0]), str(edge[1]), _normalize_direction(edge[2]), "" if edge[3] is None else str(edge[3])]
         for edge in raw_connections
@@ -527,13 +518,13 @@ def normalize_upstream_digest(payload: Mapping[str, object]) -> dict[str, object
 
     raw_ontology = payload["ontology"]
     if not isinstance(raw_ontology, Sequence):
-        raise UpstreamPinError("upstream digest 'ontology' must be a sequence")
+        raise UpstreamInputError("upstream digest 'ontology' must be a sequence")
     ontology = {str(entry["variable"]): str(entry["term"]) for entry in raw_ontology}
 
     raw_parameters = payload["parameters"]
     raw_model_parameters = payload["model_parameters"]
     if not isinstance(raw_parameters, Mapping) or not isinstance(raw_model_parameters, Mapping):
-        raise UpstreamPinError("upstream digest 'parameters' / 'model_parameters' must be mappings")
+        raise UpstreamInputError("upstream digest 'parameters' / 'model_parameters' must be mappings")
 
     return {
         "model_name": str(payload["model_name"]).strip(),
@@ -559,11 +550,11 @@ def _mapping_field(digest: Mapping[str, object], key: str) -> dict[str, object]:
     """Read a digest field that must be a mapping.
 
     Raises:
-        UpstreamPinError: if the field is absent-and-not-a-mapping or malformed.
+        UpstreamInputError: if the field is absent-and-not-a-mapping or malformed.
     """
     value = digest.get(key, {})
     if not isinstance(value, Mapping):
-        raise UpstreamPinError(f"digest field {key!r} must be a mapping, got {type(value).__name__}")
+        raise UpstreamInputError(f"digest field {key!r} must be a mapping, got {type(value).__name__}")
     return dict(value)
 
 
@@ -698,13 +689,15 @@ def binding_issues(spec: GnnSpec, runtime: Mapping[str, ArrayF]) -> list[str]:
 
 
 def check_specs(project_root: Path) -> dict[str, object]:
-    """Validate every shipped specification against its runtime model and the pin.
+    """Validate every shipped specification against its runtime model.
 
-    Returns a deterministic report; ``passed`` is true only when the pin parses
-    and every specification binds to its registered runtime model.
+    Returns a deterministic report; ``passed`` is true only when the
+    specifications exist and each one binds to its registered runtime model.
+    The pin, its pointer and the specifications' upstream syntax are
+    ``gnn.importers``' check, not this one: the binding below is the member
+    evidence no upstream reader can decide.
     """
     root = Path(project_root)
-    pin = load_upstream_pin(root / PIN_RELATIVE_PATH)
     rows: list[dict[str, object]] = []
     for path in spec_paths(root):
         spec = parse_spec(path.read_text(encoding="utf-8"), source=str(path))
@@ -724,12 +717,6 @@ def check_specs(project_root: Path) -> dict[str, object]:
         )
     return {
         "schema_version": "1.0",
-        "pin": {
-            "repository": pin.repository,
-            "commit": pin.commit,
-            "version": pin.version,
-            "date_recorded": pin.date_recorded,
-        },
         "specs": rows,
         "passed": bool(rows) and all(row["passed"] for row in rows),
     }
