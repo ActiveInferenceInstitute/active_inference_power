@@ -298,7 +298,12 @@ def test_sequential_agent_spec_declares_the_runtime_matrices() -> None:
     assert binding_issues(spec, runtime) == []
     assert spec.ontology["s"] == "HiddenState"
     assert spec.model_parameters["posterior_threshold"] == "0.9"
-    assert spec.connections[0].source == "D" and spec.connections[0].target == "s"
+    first_edge = spec.connections[0]
+    assert (first_edge.source, first_edge.target, first_edge.label) == (
+        "D",
+        "s",
+        "prior_initialization",
+    )
 
 
 def test_reference_action_loop_spec_declares_the_runtime_shapes() -> None:
