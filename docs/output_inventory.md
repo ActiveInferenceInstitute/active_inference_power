@@ -8,6 +8,17 @@ root to every producer, audit, renderer binding, review, and finalizer. Literal 
 `output/precision/`, and `output/campaign-v2/` rows below are retained
 historical namespaces, not aliases for `<bundle-root>`.
 
+The project-owned `scripts/render_manuscript.py --output-root <bundle-root>`
+is the authoritative delegate to the separately provisioned controlled
+renderer; it consumes strict variables and the generated figure registry
+before binding any output. It neither copies the renderer nor creates its
+project link. See [the rendering pipeline](rendering_pipeline.md).
+
+Gate-only host measurements are generated separately as
+[`_generated/gate-runtimes.md`](_generated/gate-runtimes.md) and its JSON
+receipt by `scripts/measure_gates.py`; they never supply manuscript variables
+or scientific results.
+
 | Artifact | Generator | Consumer |
 |---|---|---|
 | `<bundle-root>/results.json` | `scripts/generate_results.py` | manuscript, figures, dashboard; carries source and execution-tree witnesses plus deterministic computational-work accounting |
