@@ -166,6 +166,18 @@ def test_pin_file_names_the_canonical_release() -> None:
     assert pin.parser_entry_point() == ("gnn.parsers.markdown_parser", "MarkdownGNNParser")
 
 
+def test_pin_file_declares_the_importer_pin_schema() -> None:
+    """The pin carries the canonical importer-pin schema and its record date."""
+    data = json.loads(PIN_PATH.read_text(encoding="utf-8"))
+    assert data["schema"] == "gnn-importer-pin/v1"
+    assert data["recorded"]
+    # The upstream release loader models only its own identity, so the
+    # importer-pin fields travel in ``extras``: neither key may be dropped.
+    pin = load_upstream_pin(PIN_PATH)
+    assert pin.extras["schema"] == "gnn-importer-pin/v1"
+    assert pin.extras["recorded"] == data["recorded"]
+
+
 @pytest.mark.parametrize(
     "mutate, message",
     [
@@ -298,7 +310,12 @@ def test_sequential_agent_spec_declares_the_runtime_matrices() -> None:
     assert binding_issues(spec, runtime) == []
     assert spec.ontology["s"] == "HiddenState"
     assert spec.model_parameters["posterior_threshold"] == "0.9"
-    assert spec.connections[0].source == "D" and spec.connections[0].target == "s"
+    first_edge = spec.connections[0]
+    assert (first_edge.source, first_edge.target, first_edge.label) == (
+        "D",
+        "s",
+        "prior_initialization",
+    )
 
 
 def test_reference_action_loop_spec_declares_the_runtime_shapes() -> None:
