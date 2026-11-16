@@ -9,16 +9,36 @@ from matplotlib import pyplot as plt
 import pytest
 
 from scripts.audit_figure_accessibility import audit_figure_accessibility
-from scripts.artifacts import sha256_file
+from scripts.artifacts import atomic_write_json, sha256_file
+from scripts.release_provenance import execution_source_sha256
 from scripts.run_research_atlas import (
     ATLAS_STATUS,
     LANE_IDS,
     ROOT,
     ResearchAtlasPlan,
+    _assert_stable_execution_source,
     _canonical_hash,
+    _publish_staged_atlas,
     main,
     run_research_atlas,
 )
+
+
+def _write_execution_source_tree(project_root: Path) -> None:
+    """Populate the full required witness surface without executing its files."""
+    for relative in (
+        "src/active_inference_power/scenario.py",
+        "scripts/run_research_atlas.py",
+        "data/input.csv",
+        "pyproject.toml",
+        "uv.lock",
+        "domain_profile.yaml",
+        "experiment_plan.yaml",
+        "manuscript/config.yaml",
+    ):
+        path = project_root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(f"# {relative}\n", encoding="utf-8")
 
 
 def _small_real_plan() -> ResearchAtlasPlan:
@@ -39,6 +59,7 @@ def _small_real_plan() -> ResearchAtlasPlan:
 
 def test_real_atlas_bundle_is_atomic_hash_bound_and_accessible(tmp_path: Path) -> None:
     target = tmp_path / "bounded-research-atlas"
+    initial_source_sha256 = execution_source_sha256(ROOT)
     receipt = run_research_atlas(target, _small_real_plan())
 
     assert target.is_dir()
@@ -57,8 +78,20 @@ def test_real_atlas_bundle_is_atomic_hash_bound_and_accessible(tmp_path: Path) -
     assert set(atlas["canonical_plan"]["lane_seed_schedule"]) == set(LANE_IDS)
     assert set(atlas["lanes"]) == set(LANE_IDS)
     assert set(atlas["canonical_plan"]["domain_contracts"]) == set(LANE_IDS)
-    assert set(atlas["source_hashes"]) == {"orchestrator", *LANE_IDS}
-    assert all(len(value) == 64 for value in atlas["source_hashes"].values())
+    assert set(atlas) == {
+        "kind",
+        "contract_version",
+        "status",
+        "canonical_plan",
+        "plan_hash",
+        "execution_source_sha256",
+        "lanes",
+        "claim_boundary",
+        "content_hash",
+        "content_hash_scope",
+    }
+    assert atlas["contract_version"] == "2.0"
+    assert atlas["execution_source_sha256"] == initial_source_sha256
     assert "does not promote" in atlas["claim_boundary"]
     assert atlas["lanes"]["R1"]["pooled_utility_or_policy_ranking"] == "not_reported"
     assert atlas["lanes"]["R2"]["all_null"] is True
@@ -71,6 +104,18 @@ def test_real_atlas_bundle_is_atomic_hash_bound_and_accessible(tmp_path: Path) -
     assert manifest["status"] == ATLAS_STATUS
     assert manifest["plan_hash"] == atlas["plan_hash"]
     assert manifest["atlas_content_hash"] == atlas["content_hash"]
+    assert set(manifest) == {
+        "kind",
+        "schema_version",
+        "status",
+        "plan_hash",
+        "atlas_content_hash",
+        "execution_source_sha256",
+        "artifacts",
+        "claim_boundary",
+    }
+    assert manifest["schema_version"] == "2.0"
+    assert manifest["execution_source_sha256"] == initial_source_sha256
     assert set(manifest["artifacts"]) == {
         "atlas",
         "figure_registry",
@@ -115,6 +160,81 @@ def test_real_atlas_bundle_is_atomic_hash_bound_and_accessible(tmp_path: Path) -
     assert dashboard["figure_registry_sha256"] == sha256_file(registry_path)
     assert [lane["id"] for lane in dashboard["lanes"]] == list(LANE_IDS)
     assert "No pass/fail promotion" in dashboard["claim_boundary"]
+
+
+def test_atlas_publication_accepts_unchanged_execution_witness(
+    tmp_path: Path,
+) -> None:
+    source_root = tmp_path / "source"
+    _write_execution_source_tree(source_root)
+    initial = execution_source_sha256(source_root)
+    staging_root = tmp_path / "staged"
+    staging_root.mkdir()
+    metadata = {"execution_source_sha256": initial}
+    atomic_write_json(staging_root / "witness.json", metadata)
+    target = tmp_path / "published"
+
+    _assert_stable_execution_source(initial, project_root=source_root)
+    _publish_staged_atlas(
+        staging_root, target, initial, project_root=source_root
+    )
+
+    assert not staging_root.exists()
+    assert json.loads(
+        (target / "witness.json").read_text(encoding="utf-8")
+    ) == metadata
+
+
+@pytest.mark.parametrize("mutation", ("change-dependency", "add", "delete", "rename"))
+def test_atlas_rejects_execution_source_drift_before_publication(
+    tmp_path: Path, mutation: str,
+) -> None:
+    source_root = tmp_path / "source"
+    _write_execution_source_tree(source_root)
+    initial = execution_source_sha256(source_root)
+    staging_root = tmp_path / "staged"
+    staging_root.mkdir()
+    metadata = {"execution_source_sha256": initial}
+    witness_path = staging_root / "witness.json"
+    atomic_write_json(witness_path, metadata)
+    target = tmp_path / "published"
+    dependency = source_root / "src" / "active_inference_power" / "scenario.py"
+    original = dependency.read_bytes()
+    other_path = dependency.with_name("other_scenario.py")
+
+    if mutation == "change-dependency":
+        dependency.write_bytes(original + b"# changed\n")
+    elif mutation == "add":
+        other_path.write_bytes(original)
+    elif mutation == "delete":
+        dependency.unlink()
+    else:
+        dependency.rename(other_path)
+    assert execution_source_sha256(source_root) != initial
+
+    with pytest.raises(RuntimeError, match="execution source changed"):
+        _assert_stable_execution_source(initial, project_root=source_root)
+    with pytest.raises(RuntimeError, match="execution source changed"):
+        _publish_staged_atlas(
+            staging_root, target, initial, project_root=source_root
+        )
+    assert not target.exists()
+    assert json.loads(witness_path.read_text(encoding="utf-8")) == metadata
+
+    if mutation == "add":
+        other_path.unlink()
+    elif mutation == "rename":
+        other_path.rename(dependency)
+    else:
+        dependency.write_bytes(original)
+    assert execution_source_sha256(source_root) == initial
+    _publish_staged_atlas(
+        staging_root, target, initial, project_root=source_root
+    )
+    assert not staging_root.exists()
+    assert json.loads(
+        (target / "witness.json").read_text(encoding="utf-8")
+    ) == metadata
 
 
 def test_atlas_refuses_default_or_existing_output_roots_without_overwrite(tmp_path: Path) -> None:

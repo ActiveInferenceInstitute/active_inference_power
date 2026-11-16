@@ -58,6 +58,14 @@ and writes `output/quality.json` with its coverage evidence. Unlike the docs
 check, it is not a read-only audit. The quality receipt alone does not render,
 finalize, or publish a bundle.
 
+Its path-bound `quality_input_sha256` includes the required `models/`
+directory: the pin and both shipped specifications are quality inputs. Changed
+bytes, additions, removals, or renames invalidate a prior witness; exact path
+and byte restoration restores it. Missing required directories fail explicitly.
+Generated output, build products, environments, and excluded caches remain
+outside the witness. This quality-input inventory is distinct from the shared
+execution-source allowlist and does not change GNN ownership or pins.
+
 ## Offline pinned GNN conformance
 
 The authoritative pin is [`models/gnn-pin.json`](../models/gnn-pin.json), using

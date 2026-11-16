@@ -54,6 +54,18 @@ scripts/run_complexity_experiments.py --output-root <new isolated directory>
 None of these lanes changes a release certificate, supplies a manuscript result, or
 promotes an external fixture into a synthetic validity claim.
 
+Research-atlas contract 2.0 captures the shared `execution_source_sha256`
+before plan construction or lane evaluation. The runner compares that initial
+witness after computation and again immediately before atomic publication.
+The atlas content identity and schema-2.0 manifest retain the same initial
+witness; the former seven-file `source_hashes` mapping is retired. Failed
+publication retains the fresh-target and staging-cleanup boundaries.
+
+This is a disk pre/post witness, not loaded-module attestation or detection of
+change-and-restore races. Use admitted immutable source and a fresh interpreter.
+Focused metadata/publication controls do not qualify the six scientific lanes,
+refresh historical bundles, or promote research output into a release.
+
 Conditional power is evaluated as an investigator-declared design:
 
 ```text
