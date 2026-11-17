@@ -13,7 +13,7 @@ description = "Conditional adaptive-study design comparisons, multiple testing, 
 authors = [
     {name = "Daniel Ari Friedman", email = "daniel@activeinference.institute"}
 ]
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 license = {file = "LICENSE"}
 dependencies = [
     "numpy>=1.24.0",
@@ -84,6 +84,7 @@ exclude_lines = [
 select = ["E4", "E7", "E9", "F"]
 
 [tool.mypy]
+python_version = "3.12"
 # External scientific runtimes do not currently ship complete PEP 561 stubs in
 # the supported environment. Source contracts remain checked while those
 # imports are treated as typed runtime boundaries.
