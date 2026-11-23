@@ -44,6 +44,7 @@ QUALITY_INPUT_DIRECTORIES = (
     "docs",
     "manuscript",
     "data",
+    "models",
     ".agents",
     ".github",
 )
@@ -79,7 +80,8 @@ def quality_input_paths(project_root: Path = ROOT) -> tuple[Path, ...]:
     it works in a dirty checkout while excluding generated output, virtual
     environments, build products, caches, and user-local tooling.  The full
     test run exercises source, scripts, examples, documentation, manuscript,
-    and data fixtures; each belongs in the quality witness.
+    data fixtures, and models (the GNN pin and specifications); each belongs in
+    the quality witness.
     """
     project = Path(project_root).resolve()
     root_files = tuple(project / relative for relative in QUALITY_INPUT_ROOT_FILES)
@@ -98,6 +100,7 @@ def quality_input_paths(project_root: Path = ROOT) -> tuple[Path, ...]:
             for path in directory.rglob("*")
             if path.is_file()
             and "__pycache__" not in path.parts
+            and not any(part.endswith(".egg-info") for part in path.relative_to(directory).parts[:-1])
             and path.suffix != ".pyc"
             and path.name != ".DS_Store"
         )

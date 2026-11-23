@@ -35,6 +35,23 @@ def _quality_report(digest: str) -> dict[str, object]:
     }
 
 
+def _write_quality_input_tree(project_root: Path) -> None:
+    """Create real authored inputs for byte/path provenance checks only."""
+    for directory in QUALITY_INPUT_DIRECTORIES:
+        (project_root / directory).mkdir(parents=True, exist_ok=True)
+    for relative in QUALITY_INPUT_ROOT_FILES:
+        (project_root / relative).write_text(f"# {relative}\n", encoding="utf-8")
+    source_root = Path(__file__).resolve().parent.parent
+    for relative in (
+        "models/gnn-pin.json",
+        "models/reference_action_loop.gnn.md",
+        "models/sequential_evidence_agent.gnn.md",
+    ):
+        destination = project_root / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes((source_root / relative).read_bytes())
+
+
 def test_quality_pass_requires_real_collection_and_both_coverage_gates() -> None:
     assert _passes_quality_gate(
         test_count=1,
@@ -71,12 +88,9 @@ def test_quality_pass_requires_real_collection_and_both_coverage_gates() -> None
 def test_quality_input_witness_is_path_bound_and_tracks_test_harness_changes(
     tmp_path: Path,
 ) -> None:
-    for directory in QUALITY_INPUT_DIRECTORIES:
-        (tmp_path / directory).mkdir(parents=True, exist_ok=True)
+    _write_quality_input_tree(tmp_path)
     (tmp_path / "src" / "active_inference_power").mkdir(exist_ok=True)
     (tmp_path / "tests" / "fixtures").mkdir(parents=True, exist_ok=True)
-    for relative in QUALITY_INPUT_ROOT_FILES:
-        (tmp_path / relative).write_text(f"# {relative}\n", encoding="utf-8")
     (tmp_path / "scripts" / "generate_quality_report.py").write_text(
         "# runner\n", encoding="utf-8"
     )
@@ -106,6 +120,9 @@ def test_quality_input_witness_is_path_bound_and_tracks_test_harness_changes(
         "docs/contract.md",
         "manuscript/section.md",
         "data/fixture.csv",
+        "models/gnn-pin.json",
+        "models/reference_action_loop.gnn.md",
+        "models/sequential_evidence_agent.gnn.md",
     } <= included
 
     first = quality_input_sha256(tmp_path)
@@ -139,6 +156,100 @@ def test_quality_input_witness_is_path_bound_and_tracks_test_harness_changes(
         path.write_text("changed\n", encoding="utf-8")
         assert quality_input_sha256(tmp_path) != third
         third = quality_input_sha256(tmp_path)
+
+
+@pytest.mark.parametrize(
+    "relative",
+    (
+        "models/gnn-pin.json",
+        "models/reference_action_loop.gnn.md",
+        "models/sequential_evidence_agent.gnn.md",
+    ),
+    ids=("pin", "reference-spec", "sequential-spec"),
+)
+def test_quality_input_witness_rejects_changed_model_bytes(
+    tmp_path: Path, relative: str,
+) -> None:
+    _write_quality_input_tree(tmp_path)
+    initial = quality_input_sha256(tmp_path)
+    report = {"quality_input_sha256": initial}
+    path = tmp_path / relative
+    original = path.read_bytes()
+
+    path.write_bytes(original + b"\n")
+    assert quality_input_sha256(tmp_path) != initial
+    with pytest.raises(ValueError, match="quality-input provenance mismatch"):
+        validate_quality_input_provenance(report, project_root=tmp_path)
+
+    path.write_bytes(original)
+    assert validate_quality_input_provenance(report, project_root=tmp_path) == initial
+
+
+@pytest.mark.parametrize("mutation", ("add", "delete", "rename"))
+def test_quality_input_witness_rejects_model_membership_changes(
+    tmp_path: Path, mutation: str,
+) -> None:
+    _write_quality_input_tree(tmp_path)
+    initial = quality_input_sha256(tmp_path)
+    report = {"quality_input_sha256": initial}
+    original_path = tmp_path / "models" / "reference_action_loop.gnn.md"
+    original = original_path.read_bytes()
+    other_path = original_path.with_name("another_model.gnn.md")
+
+    if mutation == "add":
+        other_path.write_bytes(original)
+    elif mutation == "delete":
+        original_path.unlink()
+    else:
+        original_path.rename(other_path)
+    assert quality_input_sha256(tmp_path) != initial
+    with pytest.raises(ValueError, match="quality-input provenance mismatch"):
+        validate_quality_input_provenance(report, project_root=tmp_path)
+
+    if mutation == "add":
+        other_path.unlink()
+    elif mutation == "delete":
+        original_path.write_bytes(original)
+    else:
+        other_path.rename(original_path)
+    assert validate_quality_input_provenance(report, project_root=tmp_path) == initial
+
+
+def test_quality_input_witness_excludes_generated_outputs_and_model_caches(
+    tmp_path: Path,
+) -> None:
+    _write_quality_input_tree(tmp_path)
+    initial = quality_input_sha256(tmp_path)
+    report = {"quality_input_sha256": initial}
+    for relative in (
+        "output/quality.json",
+        "build/package.whl",
+        ".venv/lib/site.py",
+        ".pytest_cache/v/cache/nodeids",
+        "src/active_inference_power.egg-info/SOURCES.txt",
+        "models/__pycache__/cached.py",
+        "models/cached.pyc",
+        "models/.DS_Store",
+    ):
+        path = tmp_path / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        for contents in ("first\n", "changed\n"):
+            path.write_text(contents, encoding="utf-8")
+            assert validate_quality_input_provenance(
+                report, project_root=tmp_path
+            ) == initial
+
+
+def test_quality_input_witness_requires_models_directory(tmp_path: Path) -> None:
+    _write_quality_input_tree(tmp_path)
+    initial = quality_input_sha256(tmp_path)
+    (tmp_path / "models").rename(tmp_path / "removed-models")
+    with pytest.raises(
+        FileNotFoundError, match="authored input directory is missing: .*models"
+    ):
+        validate_quality_input_provenance(
+            {"quality_input_sha256": initial}, project_root=tmp_path
+        )
 
 
 def test_quality_refresh_revokes_completion_before_replacing_quality_evidence(

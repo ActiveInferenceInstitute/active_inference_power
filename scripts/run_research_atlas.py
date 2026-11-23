@@ -82,20 +82,12 @@ from scripts.artifacts import (
     require_safe_output_root,
     sha256_file,
 )
+from scripts.release_provenance import execution_source_sha256
 
 
-ATLAS_CONTRACT_VERSION = "1.0"
+ATLAS_CONTRACT_VERSION = "2.0"
 ATLAS_STATUS = "research_only_not_for_promotion_or_release"
 LANE_IDS = ("R1", "R2", "R3", "R4", "R5", "G4")
-_SOURCE_FILES = {
-    "orchestrator": Path(__file__),
-    "R1": ROOT / "src/active_inference_power/testing_setting_sensitivity.py",
-    "R2": ROOT / "src/active_inference_power/selection_sensitivity.py",
-    "R3": ROOT / "src/active_inference_power/dynamic_process_sensitivity.py",
-    "R4": ROOT / "src/active_inference_power/sequential_atlas.py",
-    "R5": ROOT / "src/active_inference_power/repeated_policy_evaluation.py",
-    "G4": ROOT / "src/active_inference_power/multi_target_environment.py",
-}
 
 
 def _positive_integer(value: object, name: str) -> int:
@@ -355,23 +347,28 @@ def _domain_contracts(plan: ResearchAtlasPlan, lane_seeds: Mapping[str, int]) ->
     return inputs, contracts
 
 
-def _source_hashes() -> dict[str, str]:
-    """Hash every source module whose public API defines this atlas contract."""
-    missing = [str(path) for path in _SOURCE_FILES.values() if not path.is_file()]
-    if missing:
-        raise FileNotFoundError(f"research-atlas source file is missing: {missing}")
-    return {name: sha256_file(path) for name, path in _SOURCE_FILES.items()}
+def _assert_stable_execution_source(
+    initial_source_sha256: str, *, project_root: Path = ROOT,
+) -> None:
+    """Reject persistent source drift without replacing the original witness."""
+    if execution_source_sha256(project_root) != initial_source_sha256:
+        raise RuntimeError(
+            "research-atlas execution source changed; refusing to publish results"
+        )
 
 
 def build_research_atlas(plan: ResearchAtlasPlan) -> dict[str, Any]:
     """Evaluate every declared lane and return one JSON-safe atlas mapping.
 
-    This function deliberately performs no file I/O.  Its return value carries
-    plan, source, scenario, and configuration identities so a renderer or a
-    later frozen research configuration can reuse the same computation contract.
+    This function reads the shared execution-source witness before domain
+    construction and rejects persistent drift after evaluation. It writes no
+    artifacts; the returned source witness is part of the atlas content identity.
+    Disk witnesses do not attest to already-loaded modules or detect changes
+    restored between checks. Use immutable source and a fresh interpreter.
     """
     if not isinstance(plan, ResearchAtlasPlan):
         raise ValueError("plan must be a ResearchAtlasPlan")
+    initial_source_sha256 = execution_source_sha256(ROOT)
     # ``to_mapping`` intentionally contains only a documented nested sample
     # plan; reconstructing field-by-field avoids accepting a low-level-mutated
     # frozen dataclass as an execution contract.
@@ -425,6 +422,7 @@ def build_research_atlas(plan: ResearchAtlasPlan) -> dict[str, Any]:
             workers=workers,
         ),
     }
+    _assert_stable_execution_source(initial_source_sha256)
     canonical_plan = {
         "contract_version": ATLAS_CONTRACT_VERSION,
         "research_plan": normalized.to_mapping(),
@@ -438,7 +436,7 @@ def build_research_atlas(plan: ResearchAtlasPlan) -> dict[str, Any]:
         "status": ATLAS_STATUS,
         "canonical_plan": canonical_plan,
         "plan_hash": plan_hash,
-        "source_hashes": _source_hashes(),
+        "execution_source_sha256": initial_source_sha256,
         "lanes": results,
         "claim_boundary": (
             "This compact atlas reports finite, declared, source-hash-bound research "
@@ -1037,17 +1035,31 @@ def _manifest(staging_root: Path, atlas: Mapping[str, Any]) -> dict[str, Any]:
         )
     return {
         "kind": "bounded_research_atlas_manifest",
-        "schema_version": "1.0",
+        "schema_version": ATLAS_CONTRACT_VERSION,
         "status": ATLAS_STATUS,
         "plan_hash": str(atlas["plan_hash"]),
         "atlas_content_hash": str(atlas["content_hash"]),
-        "source_hashes": _mapping(atlas.get("source_hashes"), "source hashes"),
+        "execution_source_sha256": atlas["execution_source_sha256"],
         "artifacts": artifacts,
         "claim_boundary": (
             "This manifest binds a bounded research bundle only. It is intentionally "
             "barred from release finalization or publication promotion."
         ),
     }
+
+
+def _publish_staged_atlas(
+    staging_root: Path,
+    target: Path,
+    initial_source_sha256: str,
+    *,
+    project_root: Path = ROOT,
+) -> None:
+    """Publish a prepared bundle only while its original source witness holds."""
+    _assert_stable_execution_source(
+        initial_source_sha256, project_root=project_root
+    )
+    os.replace(staging_root, target)
 
 
 def run_research_atlas(output_root: Path, plan: ResearchAtlasPlan | None = None) -> dict[str, Any]:
@@ -1079,7 +1091,9 @@ def run_research_atlas(output_root: Path, plan: ResearchAtlasPlan | None = None)
         manifest = _manifest(staging_root, atlas)
         manifest_path = staging_root / "manifest.json"
         atomic_write_json(manifest_path, manifest)
-        os.replace(staging_root, target)
+        _publish_staged_atlas(
+            staging_root, target, atlas["execution_source_sha256"]
+        )
     except BaseException:
         if staging_root.exists():
             shutil.rmtree(staging_root)

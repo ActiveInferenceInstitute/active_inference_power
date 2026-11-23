@@ -1,13 +1,12 @@
 # Active Inference Power — forward workboard
 
 This workboard distinguishes completed release hardening from future research
-work. Completed items remain listed with their source-bound evidence so later
-extensions can retain the same gates. There are no open, locally executable
-workboard tickets; one minor metadata decision remains open below. The R and G
-sections preserve completed evidence lanes and claim decisions. Any new
-extension must first be entered as a bounded
-task with its estimand, evidence class, and acceptance gate. The retained
-evidence boundaries remain in
+work. Completed items retain their original source-bound evidence. The bounded
+software qualification below does not reopen those historical lanes or create
+a source-current scientific release. The minor M6 metadata decision remains
+open. Any new research extension must first name its estimand, evidence class,
+and acceptance gate.
+The retained evidence boundaries remain in
 [`docs/research_roadmap.md`](docs/research_roadmap.md),
 [`docs/claim_audit.md`](docs/claim_audit.md), the formalism registry, and the
 hash-linked, source-bound release bundle recorded below.
@@ -47,6 +46,17 @@ hash-linked, source-bound release bundle recorded below.
   release generation must not fetch benchmark data. The completed benchmark
   preflight receipt is not an acquisition, license adjudication, or external
   benchmark release.
+
+## Bounded provenance qualification
+
+| ID | Software status | Remaining evidence boundary |
+|---|---|---|
+| P2 | Models-inclusive quality freshness controls passed focused real-file checks in `tests/test_generate_quality_report.py`; producer: `scripts/generate_quality_report.py`. | This proves byte/membership invalidation, restoration, exclusions, and required-directory refusal, not a fresh full-suite quality or release receipt. |
+| P3 | Atlas source-drift and atomic-publication controls passed focused real-file checks in `tests/test_research_atlas_script.py`; producer: `scripts/run_research_atlas.py`. | Contract 2.0 replaces the seven-file `source_hashes` map with the initial shared `execution_source_sha256`. The six-lane integration test still requires separate scientific execution authorization; no atlas or historical output was regenerated. |
+
+Documentation describes these software contracts; historical research, campaign,
+and release receipts retain their original bindings and are not refreshed by
+these focused controls.
 
 ## Open minor — version metadata drift
 
