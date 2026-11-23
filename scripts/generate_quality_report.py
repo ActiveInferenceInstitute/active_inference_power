@@ -100,6 +100,7 @@ def quality_input_paths(project_root: Path = ROOT) -> tuple[Path, ...]:
             for path in directory.rglob("*")
             if path.is_file()
             and "__pycache__" not in path.parts
+            and not any(part.endswith(".egg-info") for part in path.relative_to(directory).parts[:-1])
             and path.suffix != ".pyc"
             and path.name != ".DS_Store"
         )

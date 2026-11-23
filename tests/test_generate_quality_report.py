@@ -226,6 +226,7 @@ def test_quality_input_witness_excludes_generated_outputs_and_model_caches(
         "build/package.whl",
         ".venv/lib/site.py",
         ".pytest_cache/v/cache/nodeids",
+        "src/active_inference_power.egg-info/SOURCES.txt",
         "models/__pycache__/cached.py",
         "models/cached.pyc",
         "models/.DS_Store",
