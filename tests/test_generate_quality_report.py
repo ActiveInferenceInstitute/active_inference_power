@@ -118,7 +118,7 @@ def test_quality_input_witness_is_path_bound_and_tracks_test_harness_changes(
         "scripts/non_generator_helper.py",
         "examples/example.py",
         "docs/contract.md",
-        "manuscript/section.md",
+        "docs/manuscript/section.md",
         "data/fixture.csv",
         "models/gnn-pin.json",
         "models/reference_action_loop.gnn.md",

@@ -43,9 +43,9 @@ the complete source-gate composition.
 The fast path deliberately omits slow tests, full coverage, upstream GNN
 conformance, and packaging. Passing it does not establish a release coverage
 receipt. Passing `all` also does not render, finalize, or publish a scientific
-bundle: follow the separate [rendering pipeline](rendering_pipeline.md) and
-[release review](release_review.md) for that evidence chain. The
-[testing philosophy](testing_philosophy.md) defines the real-fixture and
+bundle: follow the separate [rendering pipeline](publication/rendering_pipeline.md) and
+[release review](publication/release_review.md) for that evidence chain. The
+[testing philosophy](validation/testing_philosophy.md) defines the real-fixture and
 coverage policy.
 
 Collection marks tests whose fixture closure includes `generated_fast_bundle`

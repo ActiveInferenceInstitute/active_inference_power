@@ -785,7 +785,7 @@ def review_release(
     _check(
         checks,
         "manuscript_presentation",
-        lambda: _require_passing_manuscript_presentation_audit(ROOT / "manuscript", output),
+        lambda: _require_passing_manuscript_presentation_audit(ROOT / "docs" / "manuscript", output),
     )
     if require_render:
         _check(
@@ -892,7 +892,7 @@ def main() -> int:
         "--config",
         type=Path,
         default=None,
-        help="Exact preregistered configuration source; defaults to manuscript/config.yaml.",
+        help="Exact preregistered configuration source; defaults to docs/manuscript/config.yaml.",
     )
     parser.add_argument("--skip-render", action="store_true")
     parser.add_argument("--skip-clean-install", action="store_true")

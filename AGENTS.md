@@ -30,11 +30,11 @@ engine into this package or present it as a public dependency.
 
 ## Required reading before edits
 
-Read `docs/agent_instructions.md`, `docs/architecture.md`, and
-`docs/testing_philosophy.md` before source/test changes. Read
-`docs/rendering_pipeline.md` and `docs/syntax_guide.md` before manuscript or
+Read `docs/guides/agent_instructions.md`, `docs/architecture/architecture.md`, and
+`docs/validation/testing_philosophy.md` before source/test changes. Read
+`docs/publication/rendering_pipeline.md` and `docs/reference/syntax_guide.md` before manuscript or
 output changes. Read the corresponding directory guide under `src/`, `tests/`,
-`scripts/`, `manuscript/`, or `data/` when present.
+`scripts/`, `docs/manuscript/`, or `data/` when present.
 
 For documentation or contributor-guidance changes, read `docs/AGENTS.md` and
 the guide in the affected directory first. Keep generated-artifact paths,
@@ -56,8 +56,8 @@ Read the closest applicable guide in addition to this root contract:
 | `tests/AGENTS.md` | Real-fixture testing, deterministic seeds, and fail-closed coverage |
 | `examples/AGENTS.md` | Offline public-API demonstrations and non-promotional outputs |
 | `models/AGENTS.md` | GNN specifications for the declared generative models and the upstream custody pin |
-| `manuscript/AGENTS.md` | Source templates, variables, figures, and render order |
-| `manuscript/assets/AGENTS.md` | Authored source art and cover-asset provenance |
+| `docs/manuscript/AGENTS.md` | Source templates, variables, figures, and render order |
+| `docs/manuscript/assets/AGENTS.md` | Authored source art and cover-asset provenance |
 | `.agents/AGENTS.md` | Project-local skill scaffolding |
 
 ## Standard source loop
@@ -72,7 +72,7 @@ The [gate run guide](docs/RUN_GUIDE.md) maps separately runnable arms to CI.
 `all` includes the full quality gate and pinned GNN conformance.
 
 For a source-bound candidate, use the complete recipe in
-`docs/agent_instructions.md` or `docs/rendering_pipeline.md`: result generation
+`docs/guides/agent_instructions.md` or `docs/publication/rendering_pipeline.md`: result generation
 → quality report → strict hydration → audits → render → unskipped review
 → finalizer. The quality suite creates its own real, session-scoped temporary
 bundles, so candidate draft hydration is neither needed nor render-eligible.
@@ -80,7 +80,7 @@ Do not substitute an abbreviated result/quality/hydration sequence for that
 ordering.
 
 For publication work, use the controlled-renderer procedure in
-`docs/rendering_pipeline.md`, inspect the PDF/HTML, and verify that every
+`docs/publication/rendering_pipeline.md`, inspect the PDF/HTML, and verify that every
 figure and table is present. Use one new candidate root for the entire release
 chain; never use `output/campaign/`, `output/precision/`, or
 `output/campaign-v2/` as a release candidate. Keep deferred work in `TODO.md`

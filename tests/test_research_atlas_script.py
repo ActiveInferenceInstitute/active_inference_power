@@ -34,7 +34,7 @@ def _write_execution_source_tree(project_root: Path) -> None:
         "uv.lock",
         "domain_profile.yaml",
         "experiment_plan.yaml",
-        "manuscript/config.yaml",
+        "docs/manuscript/config.yaml",
     ):
         path = project_root / relative
         path.parent.mkdir(parents=True, exist_ok=True)

@@ -115,7 +115,7 @@ def test_serialized_gate_result_requires_a_mapping_and_policy_mapping() -> None:
 def test_canonical_config_is_explicitly_all_terminal(
     small_real_certificates: dict[str, dict[str, object]],
 ) -> None:
-    experiment = _load_config(ROOT / "manuscript" / "config.yaml")["experiment"]
+    experiment = _load_config(ROOT / "docs" / "manuscript" / "config.yaml")["experiment"]
     assert experiment["certificate_gate_policy"] == default_certificate_gate_policy()
     # Missing metadata remains conservative, never diagnostic.
     unannotated = effective_certificate_gate_result(small_real_certificates)

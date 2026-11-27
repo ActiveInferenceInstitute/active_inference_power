@@ -20,7 +20,7 @@ The action-loop process is a synthetic task environment. “Simulated niche” i
 only informal shorthand for that declared process; it does not denote an
 empirical ecological, social, or deployment population, and the scenario grid
 is not a distribution over such niches. See the
-[evaluation perspective](docs/evaluation_perspective.md) for the role boundary
+[evaluation perspective](docs/research/evaluation_perspective.md) for the role boundary
 and the exact action-loop estimand.
 
 The suite includes a tested family of correction procedures, replication-level
@@ -66,8 +66,8 @@ quickstart_root="$quickstart_parent/results"
 
 This smoke bundle exercises the real project contracts but is not a release or
 publication candidate. For a full isolated candidate and the PDF/HTML review
-sequence, use the [quickstart](docs/quickstart.md) and
-[rendering pipeline](docs/rendering_pipeline.md).
+sequence, use the [quickstart](docs/guides/quickstart.md) and
+[rendering pipeline](docs/publication/rendering_pipeline.md).
 
 For the stronger non-release fast-bundle check used by continuous integration,
 keep the same fresh root and add a passing quality receipt and strict
@@ -116,19 +116,19 @@ precision, and campaign-v2 receipts: they are hash-bound historical evidence
 with their own retention rules, not disposable scratch output.
 
 The manuscript title page uses the source artwork at
-`manuscript/assets/active_inference_power_cover.png`. Its provenance and role
+`docs/manuscript/assets/active_inference_power_cover.png`. Its provenance and role
 are documented beside the asset; it is publication design, not scientific
 evidence.
 
 ## Navigation
 
-Start with the [quickstart](docs/quickstart.md), then use the
+Start with the [quickstart](docs/guides/quickstart.md), then use the
 [documentation hub](docs/README.md) for the package contract, architecture,
 the investigator/agent/task-environment distinction, action-loop
 model/process/setting contract, research roadmap, and failure
-boundaries. The [release review guide](docs/release_review.md) distinguishes
+boundaries. The [release review guide](docs/publication/release_review.md) distinguishes
 read-only verification from rendered-bundle finalization; the
-[FAQ](docs/faq.md) explains the scientific scope and retained campaign failure.
+[FAQ](docs/guides/faq.md) explains the scientific scope and retained campaign failure.
 
 ## Key package surfaces
 
@@ -136,7 +136,7 @@ This is an orientation map rather than an exhaustive module inventory. The
 public exports are defined in
 [`src/active_inference_power/__init__.py`](src/active_inference_power/__init__.py);
 the formalism-to-code map and
-[package contract](docs/PACKAGE_CONTRACT.md) provide the complete audited
+[package contract](docs/publication/PACKAGE_CONTRACT.md) provide the complete audited
 symbol, test, and boundary cross-reference.
 
 - `src/active_inference_power/corrections.py`: Bonferroni, Šidák, Holm, Hochberg, BH, BY, Storey,
@@ -179,7 +179,7 @@ symbol, test, and boundary cross-reference.
 
 The public API is re-exported from `src/active_inference_power/__init__.py`, so `import active_inference_power` works
 without test-specific path manipulation. See
-[`docs/PACKAGE_CONTRACT.md`](docs/PACKAGE_CONTRACT.md) for invariants.
+[`docs/publication/PACKAGE_CONTRACT.md`](docs/publication/PACKAGE_CONTRACT.md) for invariants.
 
 ## Generative-model specifications
 
@@ -220,8 +220,8 @@ The publication PDF/HTML renderer is a separately provisioned controlled
 release environment, not a public package dependency. This repository
 reproduces results, figures, and the hydrated manuscript; the immutable
 release PDF and accessible HTML are distributed as release assets. See
-[the controlled-renderer boundary](docs/controlled_renderer.md) and the
-maintainer [rendering pipeline](docs/rendering_pipeline.md).
+[the controlled-renderer boundary](docs/publication/controlled_renderer.md) and the
+maintainer [rendering pipeline](docs/publication/rendering_pipeline.md).
 
 Maintainers invoke the existing controlled renderer through the authoritative
 project wrapper:
@@ -245,7 +245,7 @@ for a citation that follows the release family, and the immutable version DOI
 specific v1 archive. The matching Zenodo record is
 [21695161](https://zenodo.org/records/21695161). The source-bound release
 chain and its deliberately bounded scientific claims are documented in
-[`docs/publication_metadata.md`](docs/publication_metadata.md).
+[`docs/publication/publication_metadata.md`](docs/publication/publication_metadata.md).
 
 ## License and third-party material
 
@@ -268,7 +268,7 @@ adaptive target selection, and process shifts are stress/operating-characteristi
 tracks unless the declared conditional evidence assumptions are satisfied. The
 power-cost frontier is a conditional decision-design comparison, not a policy
 optimality or utility theorem. The manuscript’s
-[`docs/scholarship_map.md`](docs/scholarship_map.md) records how active-inference
+[`docs/research/scholarship_map.md`](docs/research/scholarship_map.md) records how active-inference
 process theory, discrete-state inference, multiple-testing theory, and the
 sequential martingale/e-value literature map onto implemented methods and
 explicit non-claims.
@@ -286,11 +286,11 @@ power-per-cost across scenario cells only when their hash-bound `cost_unit` and
 one host and runtime and does not affect certificates, release status, or
 statistical interpretation.
 The formalism-to-code method is documented in
-[`docs/formalism_to_code.md`](docs/formalism_to_code.md), and the release claim
-review is recorded in [`docs/claim_audit.md`](docs/claim_audit.md).
+[`docs/architecture/formalism_to_code.md`](docs/architecture/formalism_to_code.md), and the release claim
+review is recorded in [`docs/validation/claim_audit.md`](docs/validation/claim_audit.md).
 
 The staged research agenda is documented in
-[`docs/research_roadmap.md`](docs/research_roadmap.md). Stage 1—predictable
+[`docs/research/research_roadmap.md`](docs/research/research_roadmap.md). Stage 1—predictable
 adaptive target selection has an independent split-stream confirmation path.
 The formal conditional split-confirmation result uses a separately declared,
 hash-bound static channel outside the operating grid; an action-loop example's
@@ -315,7 +315,7 @@ split-stream Storey confirmation terminal, while retaining the same-vector
 Storey power-gain record as a visible diagnostic. The v2 receipt is complete
 for that frozen campaign contract only: it neither changes the canonical
 release's all-terminal policy nor promotes a release or publication claim. See
-[`docs/storey_certificate_decision.md`](docs/storey_certificate_decision.md)
+[`docs/research/storey_certificate_decision.md`](docs/research/storey_certificate_decision.md)
 for the exact decision and receipt boundary. It is historical, hash-bound
 campaign evidence rather than a source-current release candidate: a
 source-contract refresh of this exact frozen lane first archives its prior

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Thin orchestrator: generate and inject manuscript variables.
 
-Reads ``manuscript/config.yaml`` and the selected output root's
+Reads ``docs/manuscript/config.yaml`` and the selected output root's
 ``results.json``, writes ``data/manuscript_variables.json`` there, and
-substitutes ``{{TOKEN}}`` markers in ``manuscript/*.md`` into the selected
-output root's ``manuscript/`` tree for PDF rendering.
+substitutes ``{{TOKEN}}`` markers in ``docs/manuscript/*.md`` into the selected
+output root's ``docs/manuscript/`` tree for PDF rendering.
 
 All computation lives in ``active_inference_power/manuscript_variables``; all injection lives in
 ``infrastructure.rendering.manuscript_injection``.
@@ -117,7 +117,7 @@ def _write_local_resolved_manuscript_tree(
     project_root = Path(project_root).resolve()
     output = require_safe_output_root(output, project_root=project_root)
     token_re = re.compile(r"\{\{([A-Z][A-Z0-9_]*)\}\}")
-    source = project_root / "manuscript"
+    source = project_root / "docs" / "manuscript"
     destination = output / "manuscript"
     destination.mkdir(parents=True, exist_ok=True)
     for stale in list(destination.glob("*.md")) + list(destination.glob("*.bib")):
@@ -221,7 +221,7 @@ def main() -> int:
                 run_log,
                 project_root=_PROJECT_ROOT,
                 output_root=output,
-                config_path=_PROJECT_ROOT / "manuscript" / "config.yaml",
+                config_path=_PROJECT_ROOT / "docs" / "manuscript" / "config.yaml",
                 claim_ledger_path=_PROJECT_ROOT / "data" / "claim_ledger.yaml",
             )
             validate_execution_provenance(
@@ -293,7 +293,7 @@ def main() -> int:
             _write_local_resolved_manuscript_tree(_PROJECT_ROOT, output, variables)
 
     # Render provenance is self-normalizing: write an initial placeholder,
-    # hash all manuscript/variable/registry/figure inputs with that field
+    # hash all docs/manuscript/variable/registry/figure inputs with that field
     # normalized to its source token, then write the stable digest and verify
     # that a second calculation is identical. The manifest was already made
     # incomplete above, so either write failure remains fail-closed.
@@ -337,7 +337,7 @@ def main() -> int:
                 resolved, output, "resolved_manuscript"
             )
         for source in manuscript_source_paths(_PROJECT_ROOT):
-            relative = source.relative_to(_PROJECT_ROOT / "manuscript")
+            relative = source.relative_to(_PROJECT_ROOT / "docs" / "manuscript")
             artifacts[f"source_manuscript:{relative.as_posix()}"] = artifact_record(
                 source, _PROJECT_ROOT, "manuscript_source"
             )

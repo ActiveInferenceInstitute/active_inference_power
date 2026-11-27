@@ -390,7 +390,7 @@ def test_complexity_schema_is_strict_when_present_but_optional_for_nonrelease_re
 
     project_root = Path(__file__).resolve().parent.parent
     configured = yaml.safe_load(
-        (project_root / "manuscript" / "config.yaml").read_text(encoding="utf-8")
+        (project_root / "docs" / "manuscript" / "config.yaml").read_text(encoding="utf-8")
     )["experiment"]["computational_complexity"]
     plan = complexity_plan_from_mapping(configured)
     emitted_plan = complexity_plan_from_mapping(

@@ -1,6 +1,6 @@
 # Scripts agent guide
 
-Read `../docs/architecture.md` and `CONVENTIONS.md` before changing a script.
+Read `../docs/architecture/architecture.md` and `CONVENTIONS.md` before changing a script.
 Preserve thin orchestration: configuration, subprocesses, file I/O, and
 rendering calls belong here; statistical calculations belong in
 `src/active_inference_power/`.

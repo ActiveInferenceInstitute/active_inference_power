@@ -25,7 +25,7 @@ TIMING_PROFILE_STATUS = (
     "research_only_local_runtime_diagnostic_not_for_promotion_or_release"
 )
 TIMING_PROFILE_FROZEN_PLAN_SOURCE = (
-    "manuscript/config.yaml#experiment.computational_complexity"
+    "docs/manuscript/config.yaml#experiment.computational_complexity"
 )
 TIMING_PROFILE_PROGRAMMATIC_PLAN_SOURCE = "explicit_programmatic_real_diagnostic_plan"
 TIMING_PROFILE_SOURCE_NAMES = (

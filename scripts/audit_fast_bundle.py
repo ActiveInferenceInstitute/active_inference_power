@@ -94,7 +94,7 @@ def audit_fast_bundle(
         run_log,
         project_root=project,
         output_root=output,
-        config_path=project / "manuscript" / "config.yaml",
+        config_path=project / "docs" / "manuscript" / "config.yaml",
         claim_ledger_path=project / "data" / "claim_ledger.yaml",
     )
     execution_witness = validate_execution_provenance(

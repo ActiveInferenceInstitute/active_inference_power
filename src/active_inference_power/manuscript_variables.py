@@ -1,7 +1,7 @@
 """Manuscript variable generation for active_inference_power.
 
 Single source of truth for every number that appears in the manuscript. Reads
-``manuscript/config.yaml`` (experiment parameters) and ``output/results.json``
+``docs/manuscript/config.yaml`` (experiment parameters) and ``output/results.json``
 (computed results from :mod:`simulation`, :mod:`certificates`, and the
 active-inference experiment) and returns a flat ``dict[str, str]`` of
 ``UPPERCASE_KEY -> value`` for ``{{TOKEN}}`` substitution via
@@ -67,7 +67,7 @@ _ACTION_POLICY_TABLE_LABELS = {
 
 
 def _load_config(project_root: Path) -> dict[str, Any]:
-    path = project_root / "manuscript" / "config.yaml"
+    path = project_root / "docs" / "manuscript" / "config.yaml"
     if not path.exists():
         return {}
     return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
@@ -739,7 +739,7 @@ def generate_variables(
     """Build the ``{{TOKEN}} -> value`` map for manuscript injection.
 
     Args:
-        project_root: Project directory containing ``manuscript/`` and the source
+        project_root: Project directory containing ``docs/manuscript/`` and the source
             configuration.
         require_analysis_outputs: If True, raise when ``output/results.json`` is
             absent; if False, fall back to ``N/A`` placeholders (draft mode).

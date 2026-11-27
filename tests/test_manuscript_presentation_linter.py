@@ -26,8 +26,8 @@ def _write_fixture(
     body: str = "# Body\n\nFalse discovery rate (FDR) is defined here.\n",
     variables: dict[str, str] | None = None,
 ) -> tuple[Path, Path]:
-    manuscript = root / "manuscript"
-    manuscript.mkdir()
+    manuscript = root / "docs" / "manuscript"
+    manuscript.mkdir(parents=True)
     (manuscript / "00_abstract.md").write_text(abstract, encoding="utf-8")
     (manuscript / "01_body.md").write_text(body, encoding="utf-8")
     variable_file = root / "variables.json"
@@ -52,7 +52,7 @@ def test_current_manuscript_source_presentation_audit_is_clean(
     variable_file = tmp_path / "current-source-variables.json"
     variable_file.write_text(json.dumps(variables, sort_keys=True), encoding="utf-8")
     report = audit_manuscript_presentation(
-        PROJECT_ROOT / "manuscript",
+        PROJECT_ROOT / "docs" / "manuscript",
         variable_file,
     )
     assert report["summary"] == {"finding_count": 0, "by_code": {}}

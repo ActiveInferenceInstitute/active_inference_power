@@ -18,6 +18,6 @@ results. Its files serve different roles:
 The ledger records what supports a claim and what the claim does *not* show.
 It must preserve distinctions between theory, finite simulation, calibration
 diagnostics, stress tests, and provenance checks. See the
-[claim audit](../docs/claim_audit.md) and
-[output conventions](../docs/output_conventions.md) for the corresponding
+[claim audit](../docs/validation/claim_audit.md) and
+[output conventions](../docs/reference/output_conventions.md) for the corresponding
 artifact contracts.

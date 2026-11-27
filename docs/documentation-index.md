@@ -29,56 +29,56 @@ the [run guide](RUN_GUIDE.md) for the composable gate interface.
 | [data/benchmarks/AGENTS.md](../data/benchmarks/AGENTS.md) | Benchmark custody and acquisition rules |
 | [data/benchmarks/README.md](../data/benchmarks/README.md) | Offline benchmark fixtures and provenance |
 | [docs/AGENTS.md](AGENTS.md) | Documentation claims and maintenance rules |
-| [docs/PACKAGE_CONTRACT.md](PACKAGE_CONTRACT.md) | API and mathematical invariants |
+| [docs/publication/PACKAGE_CONTRACT.md](publication/PACKAGE_CONTRACT.md) | API and mathematical invariants |
 | [docs/README.md](README.md) | Audience-based documentation hub |
 | [docs/RUN_GUIDE.md](RUN_GUIDE.md) | Shared local and CI gate interface |
 | [docs/_generated/gate-runtimes.md](_generated/gate-runtimes.md) | Generated host-specific gate measurement evidence |
-| [docs/action_in_the_loop.md](action_in_the_loop.md) | Model, process, setting, and policy execution contract |
-| [docs/agent_instructions.md](agent_instructions.md) | Contributor workflow and complete candidate chain |
-| [docs/architecture.md](architecture.md) | Source-to-artifact dependency graph |
-| [docs/claim_audit.md](claim_audit.md) | Claim, evidence, and non-claim ledger review |
-| [docs/controlled_renderer.md](controlled_renderer.md) | Public reproducibility and controlled-renderer boundary |
+| [docs/architecture/action_in_the_loop.md](architecture/action_in_the_loop.md) | Model, process, setting, and policy execution contract |
+| [docs/guides/agent_instructions.md](guides/agent_instructions.md) | Contributor workflow and complete candidate chain |
+| [docs/architecture/architecture.md](architecture/architecture.md) | Source-to-artifact dependency graph |
+| [docs/validation/claim_audit.md](validation/claim_audit.md) | Claim, evidence, and non-claim ledger review |
+| [docs/publication/controlled_renderer.md](publication/controlled_renderer.md) | Public reproducibility and controlled-renderer boundary |
 | [docs/documentation-index.md](documentation-index.md) | This flat document inventory |
-| [docs/dobriban_bh_stress_bundle.md](dobriban_bh_stress_bundle.md) | Offline finite Dobriban/BH stress receipt |
-| [docs/evaluation_perspective.md](evaluation_perspective.md) | Investigator, embedded-agent, and task-environment roles |
-| [docs/faq.md](faq.md) | Scientific and operational questions |
-| [docs/figure_accessibility.md](figure_accessibility.md) | Generated-figure accessibility audit |
-| [docs/forking_guide.md](forking_guide.md) | Safe derived-project workflow |
-| [docs/formalism_to_code.md](formalism_to_code.md) | Executable formalism and source traceability |
-| [docs/manuscript_numeric_audit.md](manuscript_numeric_audit.md) | Numeric-token audit contract |
-| [docs/manuscript_presentation_linter.md](manuscript_presentation_linter.md) | Source and resolved manuscript presentation audit |
-| [docs/output_conventions.md](output_conventions.md) | Output namespaces and provenance |
-| [docs/output_inventory.md](output_inventory.md) | Generated scientific artifact contract |
-| [docs/publication_metadata.md](publication_metadata.md) | Publication handoff and DOI identity policy |
-| [docs/quickstart.md](quickstart.md) | First disposable result bundle |
-| [docs/release_review.md](release_review.md) | Read-only review and state-changing finalization |
-| [docs/rendering_pipeline.md](rendering_pipeline.md) | Isolated candidate and controlled-renderer runbook |
-| [docs/research_roadmap.md](research_roadmap.md) | Gated research extensions |
-| [docs/scholarship_map.md](scholarship_map.md) | Literature roles and evidence boundaries |
-| [docs/storey_certificate_decision.md](storey_certificate_decision.md) | Frozen campaign policy and retained failure boundary |
-| [docs/style_guide.md](style_guide.md) | Documentation and manuscript style |
-| [docs/syntax_guide.md](syntax_guide.md) | Manuscript syntax and token policy |
-| [docs/testing_philosophy.md](testing_philosophy.md) | Real-fixture and coverage policy |
-| [docs/troubleshooting.md](troubleshooting.md) | Failure diagnosis |
-| [docs/visualization_notes.md](visualization_notes.md) | Figure estimands, uncertainty, and interpretation |
+| [docs/research/dobriban_bh_stress_bundle.md](research/dobriban_bh_stress_bundle.md) | Offline finite Dobriban/BH stress receipt |
+| [docs/research/evaluation_perspective.md](research/evaluation_perspective.md) | Investigator, embedded-agent, and task-environment roles |
+| [docs/guides/faq.md](guides/faq.md) | Scientific and operational questions |
+| [docs/publication/figure_accessibility.md](publication/figure_accessibility.md) | Generated-figure accessibility audit |
+| [docs/guides/forking_guide.md](guides/forking_guide.md) | Safe derived-project workflow |
+| [docs/architecture/formalism_to_code.md](architecture/formalism_to_code.md) | Executable formalism and source traceability |
+| [docs/validation/manuscript_numeric_audit.md](validation/manuscript_numeric_audit.md) | Numeric-token audit contract |
+| [docs/validation/manuscript_presentation_linter.md](validation/manuscript_presentation_linter.md) | Source and resolved manuscript presentation audit |
+| [docs/reference/output_conventions.md](reference/output_conventions.md) | Output namespaces and provenance |
+| [docs/reference/output_inventory.md](reference/output_inventory.md) | Generated scientific artifact contract |
+| [docs/publication/publication_metadata.md](publication/publication_metadata.md) | Publication handoff and DOI identity policy |
+| [docs/guides/quickstart.md](guides/quickstart.md) | First disposable result bundle |
+| [docs/publication/release_review.md](publication/release_review.md) | Read-only review and state-changing finalization |
+| [docs/publication/rendering_pipeline.md](publication/rendering_pipeline.md) | Isolated candidate and controlled-renderer runbook |
+| [docs/research/research_roadmap.md](research/research_roadmap.md) | Gated research extensions |
+| [docs/research/scholarship_map.md](research/scholarship_map.md) | Literature roles and evidence boundaries |
+| [docs/research/storey_certificate_decision.md](research/storey_certificate_decision.md) | Frozen campaign policy and retained failure boundary |
+| [docs/reference/style_guide.md](reference/style_guide.md) | Documentation and manuscript style |
+| [docs/reference/syntax_guide.md](reference/syntax_guide.md) | Manuscript syntax and token policy |
+| [docs/validation/testing_philosophy.md](validation/testing_philosophy.md) | Real-fixture and coverage policy |
+| [docs/guides/troubleshooting.md](guides/troubleshooting.md) | Failure diagnosis |
+| [docs/publication/visualization_notes.md](publication/visualization_notes.md) | Figure estimands, uncertainty, and interpretation |
 | [examples/AGENTS.md](../examples/AGENTS.md) | Offline example and non-claim rules |
 | [examples/README.md](../examples/README.md) | Public-API examples |
-| [manuscript/00_abstract.md](../manuscript/00_abstract.md) | Source abstract |
-| [manuscript/01_introduction.md](../manuscript/01_introduction.md) | Source introduction |
-| [manuscript/02_methodology.md](../manuscript/02_methodology.md) | Source methodology |
-| [manuscript/03_results.md](../manuscript/03_results.md) | Tokenized source results |
-| [manuscript/04_conclusion.md](../manuscript/04_conclusion.md) | Source conclusion |
-| [manuscript/05_experimental_setup.md](../manuscript/05_experimental_setup.md) | Source experimental setup |
-| [manuscript/06_reproducibility.md](../manuscript/06_reproducibility.md) | Source reproducibility statement |
-| [manuscript/07_scope_and_related_work.md](../manuscript/07_scope_and_related_work.md) | Source scope and related work |
-| [manuscript/08_supplemental_certificate_audit.md](../manuscript/08_supplemental_certificate_audit.md) | Tokenized certificate-audit supplement |
-| [manuscript/99_references.md](../manuscript/99_references.md) | Bibliography |
-| [manuscript/AGENTS.md](../manuscript/AGENTS.md) | Manuscript provenance and render-order rules |
-| [manuscript/README.md](../manuscript/README.md) | Manuscript inventory and source-to-render route |
-| [manuscript/SYNTAX.md](../manuscript/SYNTAX.md) | Manuscript labels, figures, and token rules |
-| [manuscript/assets/AGENTS.md](../manuscript/assets/AGENTS.md) | Source artwork maintenance rules |
-| [manuscript/assets/README.md](../manuscript/assets/README.md) | Cover artwork provenance and role |
-| [manuscript/preamble.md](../manuscript/preamble.md) | Renderer-specific LaTeX preamble |
+| [docs/manuscript/00_abstract.md](manuscript/00_abstract.md) | Source abstract |
+| [docs/manuscript/01_introduction.md](manuscript/01_introduction.md) | Source introduction |
+| [docs/manuscript/02_methodology.md](manuscript/02_methodology.md) | Source methodology |
+| [docs/manuscript/03_results.md](manuscript/03_results.md) | Tokenized source results |
+| [docs/manuscript/04_conclusion.md](manuscript/04_conclusion.md) | Source conclusion |
+| [docs/manuscript/05_experimental_setup.md](manuscript/05_experimental_setup.md) | Source experimental setup |
+| [docs/manuscript/06_reproducibility.md](manuscript/06_reproducibility.md) | Source reproducibility statement |
+| [docs/manuscript/07_scope_and_related_work.md](manuscript/07_scope_and_related_work.md) | Source scope and related work |
+| [docs/manuscript/08_supplemental_certificate_audit.md](manuscript/08_supplemental_certificate_audit.md) | Tokenized certificate-audit supplement |
+| [docs/manuscript/99_references.md](manuscript/99_references.md) | Bibliography |
+| [docs/manuscript/AGENTS.md](manuscript/AGENTS.md) | Manuscript provenance and render-order rules |
+| [docs/manuscript/README.md](manuscript/README.md) | Manuscript inventory and source-to-render route |
+| [docs/manuscript/SYNTAX.md](manuscript/SYNTAX.md) | Manuscript labels, figures, and token rules |
+| [docs/manuscript/assets/AGENTS.md](manuscript/assets/AGENTS.md) | Source artwork maintenance rules |
+| [docs/manuscript/assets/README.md](manuscript/assets/README.md) | Cover artwork provenance and role |
+| [docs/manuscript/preamble.md](manuscript/preamble.md) | Renderer-specific LaTeX preamble |
 | [models/AGENTS.md](../models/AGENTS.md) | GNN model and custody-pin rules |
 | [models/README.md](../models/README.md) | Model inventory and upstream custody pin |
 | [models/reference_action_loop.gnn.md](../models/reference_action_loop.gnn.md) | Action-loop reference generative model |

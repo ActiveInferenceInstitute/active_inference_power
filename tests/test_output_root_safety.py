@@ -28,9 +28,9 @@ from scripts.z_generate_manuscript_variables import (
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 _AUTHORED_FILES = (
-    PROJECT_ROOT / "manuscript" / "00_abstract.md",
-    PROJECT_ROOT / "manuscript" / "config.yaml",
-    PROJECT_ROOT / "manuscript" / "references.bib",
+    PROJECT_ROOT / "docs" / "manuscript" / "00_abstract.md",
+    PROJECT_ROOT / "docs" / "manuscript" / "config.yaml",
+    PROJECT_ROOT / "docs" / "manuscript" / "references.bib",
 )
 
 
@@ -38,9 +38,9 @@ _AUTHORED_FILES = (
     "candidate",
     (
         PROJECT_ROOT,
-        PROJECT_ROOT / "manuscript",
+        PROJECT_ROOT / "docs" / "manuscript",
         PROJECT_ROOT / "src",
-        PROJECT_ROOT / "output" / ".." / "manuscript",
+        PROJECT_ROOT / "output" / ".." / "docs" / "manuscript",
         PROJECT_ROOT / "output" / "..",
     ),
 )
@@ -80,7 +80,7 @@ def test_primary_producers_and_finalizers_reject_project_root_before_mutation() 
     before = {path: path.read_bytes() for path in _AUTHORED_FILES}
     with pytest.raises(ValueError, match="output_root"):
         run(
-            PROJECT_ROOT / "manuscript" / "config.yaml",
+            PROJECT_ROOT / "docs" / "manuscript" / "config.yaml",
             profile="fast",
             workers=1,
             output_root=PROJECT_ROOT,
@@ -108,7 +108,7 @@ def test_safe_output_roots_remain_available_inside_output_and_outside_project(
     assert require_safe_output_root(external, project_root=PROJECT_ROOT) == external.resolve()
 
 
-@pytest.mark.parametrize("authored_directory", ("manuscript", "src"))
+@pytest.mark.parametrize("authored_directory", ("docs/manuscript", "src"))
 @pytest.mark.parametrize("descendant", (False, True))
 def test_shared_output_root_guard_rejects_canonical_output_symlink_into_authored_tree(
     tmp_path: Path,

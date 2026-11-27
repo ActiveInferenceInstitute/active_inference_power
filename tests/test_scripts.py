@@ -202,7 +202,7 @@ def test_manuscript_witnesses_must_bind_the_exact_release_provenance(
 
 def _write_config(tmp_path: Path, mutate) -> Path:
     source = yaml.safe_load(
-        (PROJECT_ROOT / "manuscript" / "config.yaml").read_text(encoding="utf-8")
+        (PROJECT_ROOT / "docs" / "manuscript" / "config.yaml").read_text(encoding="utf-8")
     )
     mutate(source["experiment"])
     path = tmp_path / "config.yaml"
@@ -211,7 +211,7 @@ def _write_config(tmp_path: Path, mutate) -> Path:
 
 
 def test_load_config_accepts_canonical_experiment() -> None:
-    config = _load_config(PROJECT_ROOT / "manuscript" / "config.yaml")
+    config = _load_config(PROJECT_ROOT / "docs" / "manuscript" / "config.yaml")
     assert config["experiment"]["m"] == 200
     assert tuple(config["experiment"]["methods"]) == REFERENCE_COMPARISON_METHODS
     assert config["experiment"]["n_reps"] >= 5000
@@ -243,7 +243,7 @@ def test_isolated_certificate_policy_config_is_explicit_and_preserved(
 
 
 def test_campaign_profile_resolves_expanded_design_without_mutating_source() -> None:
-    experiment = _load_config(PROJECT_ROOT / "manuscript" / "config.yaml")["experiment"]
+    experiment = _load_config(PROJECT_ROOT / "docs" / "manuscript" / "config.yaml")["experiment"]
     resolved = _resolve_experiment_profile(experiment, "campaign")
     assert resolved["n_reps"] == 15000
     assert resolved["certificate_n_reps"] == 7500
@@ -259,7 +259,7 @@ def test_campaign_profile_resolves_expanded_design_without_mutating_source() -> 
 
 
 def test_action_loop_sample_size_accounting_matches_declared_budget() -> None:
-    experiment = _load_config(PROJECT_ROOT / "manuscript" / "config.yaml")["experiment"]
+    experiment = _load_config(PROJECT_ROOT / "docs" / "manuscript" / "config.yaml")["experiment"]
     resolved = _resolve_experiment_profile(experiment, "release")
     accounting = _sample_size_accounting(
         resolved,
@@ -280,7 +280,7 @@ def test_action_loop_sample_size_accounting_matches_declared_budget() -> None:
 
 
 def test_campaign_profile_rejects_missing_campaign() -> None:
-    experiment = _load_config(PROJECT_ROOT / "manuscript" / "config.yaml")["experiment"]
+    experiment = _load_config(PROJECT_ROOT / "docs" / "manuscript" / "config.yaml")["experiment"]
     experiment.pop("campaign")
     with pytest.raises(ValueError, match="requires experiment.campaign"):
         _resolve_experiment_profile(experiment, "campaign")
@@ -304,7 +304,7 @@ def test_run_rejects_invalid_control_values_before_mutating_output(
     sentinel.write_text('{"retained": "receipt"}\n', encoding="utf-8")
     with pytest.raises(ValueError, match=message):
         run(
-            PROJECT_ROOT / "manuscript" / "config.yaml",
+            PROJECT_ROOT / "docs" / "manuscript" / "config.yaml",
             profile="fast",
             workers=1,
             output_root=tmp_path,
@@ -583,7 +583,7 @@ def test_checkpoint_dependency_hashes_change_when_scenario_contract_changes() ->
 
 
 def test_current_conditional_dependencies_are_derived_before_resume() -> None:
-    config = _load_config(PROJECT_ROOT / "manuscript" / "config.yaml")["experiment"]
+    config = _load_config(PROJECT_ROOT / "docs" / "manuscript" / "config.yaml")["experiment"]
     dependencies = _expected_checkpoint_dependency_hashes("conditional_power", config)
     assert len(dependencies["scenario_hashes"]) == (
         len(config["action_loop"]["reliability_grid"]) + 1
@@ -602,7 +602,7 @@ def test_generated_conditional_checkpoint_matches_current_lineage(
 ) -> None:
     """A fresh fast checkpoint must be resumable under the current contract."""
     config = _resolve_experiment_profile(
-        _load_config(PROJECT_ROOT / "manuscript" / "config.yaml")["experiment"],
+        _load_config(PROJECT_ROOT / "docs" / "manuscript" / "config.yaml")["experiment"],
         "fast",
     )
     checkpoint = json.loads(

@@ -27,7 +27,7 @@ _INTERNAL_PREFIXES = ("fig:", "sec:", "eq:", "tbl:")
 
 
 def _bibliography_keys() -> set[str]:
-    source = (PROJECT_ROOT / "manuscript" / "references.bib").read_text(
+    source = (PROJECT_ROOT / "docs" / "manuscript" / "references.bib").read_text(
         encoding="utf-8"
     )
     return set(_BIB_KEY.findall(source))
@@ -35,7 +35,7 @@ def _bibliography_keys() -> set[str]:
 
 def _manuscript_citation_keys() -> set[str]:
     keys: set[str] = set()
-    for manuscript in (PROJECT_ROOT / "manuscript").glob("*.md"):
+    for manuscript in (PROJECT_ROOT / "docs" / "manuscript").glob("*.md"):
         keys.update(
             key
             for key in _AT_KEY.findall(manuscript.read_text(encoding="utf-8"))
@@ -62,7 +62,7 @@ def test_formalism_registry_citation_keys_exist_in_bibliography() -> None:
 
 
 def test_scholarship_map_is_an_evidence_matrix() -> None:
-    source = (PROJECT_ROOT / "docs" / "scholarship_map.md").read_text(
+    source = (PROJECT_ROOT / "docs" / "research" / "scholarship_map.md").read_text(
         encoding="utf-8"
     )
     for heading in (
@@ -93,7 +93,7 @@ def test_scholarship_map_is_an_evidence_matrix() -> None:
 
 def test_dobriban_preprint_and_hochberg_reference_metadata_are_explicit() -> None:
     """Keep the two-source boundary and stable bibliographic identifiers auditable."""
-    bibliography = (PROJECT_ROOT / "manuscript" / "references.bib").read_text(
+    bibliography = (PROJECT_ROOT / "docs" / "manuscript" / "references.bib").read_text(
         encoding="utf-8"
     )
     dobriban = re.search(
@@ -122,13 +122,13 @@ def test_dobriban_preprint_and_hochberg_reference_metadata_are_explicit() -> Non
     protocol = (
         PROJECT_ROOT / "src" / "active_inference_power" / "protocols" / "dobriban_bh.py"
     ).read_text(encoding="utf-8")
-    roadmap = (PROJECT_ROOT / "docs" / "research_roadmap.md").read_text(
+    roadmap = (PROJECT_ROOT / "docs" / "research" / "research_roadmap.md").read_text(
         encoding="utf-8"
     )
-    scholarship_map = (PROJECT_ROOT / "docs" / "scholarship_map.md").read_text(
+    scholarship_map = (PROJECT_ROOT / "docs" / "research" / "scholarship_map.md").read_text(
         encoding="utf-8"
     )
-    references_policy = (PROJECT_ROOT / "manuscript" / "99_references.md").read_text(
+    references_policy = (PROJECT_ROOT / "docs" / "manuscript" / "99_references.md").read_text(
         encoding="utf-8"
     )
     assert "publicly documented" in protocol
@@ -142,7 +142,7 @@ def test_dobriban_preprint_and_hochberg_reference_metadata_are_explicit() -> Non
 
 def test_foundational_and_selective_reference_dois_are_explicit() -> None:
     """Retain stable identifiers without relabeling the selective-inference preprint."""
-    bibliography = (PROJECT_ROOT / "manuscript" / "references.bib").read_text(
+    bibliography = (PROJECT_ROOT / "docs" / "manuscript" / "references.bib").read_text(
         encoding="utf-8"
     )
     expected = {
@@ -178,7 +178,7 @@ def test_public_surface_uses_canonical_terminology() -> None:
     roots = (
         PROJECT_ROOT / "README.md",
         PROJECT_ROOT / "docs",
-        PROJECT_ROOT / "manuscript",
+        PROJECT_ROOT / "docs" / "manuscript",
         PROJECT_ROOT / "examples",
     )
     text = "\n".join(
@@ -190,23 +190,23 @@ def test_public_surface_uses_canonical_terminology() -> None:
     assert "naive belief" not in text.lower()
     assert "naive" not in text.lower()
     assert "naïve" not in text.lower()
-    introduction = (PROJECT_ROOT / "manuscript" / "01_introduction.md").read_text(
+    introduction = (PROJECT_ROOT / "docs" / "manuscript" / "01_introduction.md").read_text(
         encoding="utf-8"
     )
     assert "trace field is named `wealth`" not in introduction
     assert "trace field named `wealth`" not in introduction
-    experimental_setup = (PROJECT_ROOT / "manuscript" / "05_experimental_setup.md").read_text(
+    experimental_setup = (PROJECT_ROOT / "docs" / "manuscript" / "05_experimental_setup.md").read_text(
         encoding="utf-8"
     )
     assert "{{CONFIG_SUITE_NAME}}` suite" not in experimental_setup
-    assert not (PROJECT_ROOT / "manuscript" / "layer_contract.yaml").exists()
+    assert not (PROJECT_ROOT / "docs" / "manuscript" / "layer_contract.yaml").exists()
 
 
 def test_abstract_and_introduction_define_acronyms_and_notation() -> None:
-    abstract = (PROJECT_ROOT / "manuscript" / "00_abstract.md").read_text(
+    abstract = (PROJECT_ROOT / "docs" / "manuscript" / "00_abstract.md").read_text(
         encoding="utf-8"
     )
-    introduction = (PROJECT_ROOT / "manuscript" / "01_introduction.md").read_text(
+    introduction = (PROJECT_ROOT / "docs" / "manuscript" / "01_introduction.md").read_text(
         encoding="utf-8"
     )
     assert "[@" not in abstract
@@ -218,7 +218,7 @@ def test_abstract_and_introduction_define_acronyms_and_notation() -> None:
     assert "{{QUALITY_" not in abstract
     assert "{{PUBLICATION_REPOSITORY_STATEMENT}}" in abstract
     config = yaml.safe_load(
-        (PROJECT_ROOT / "manuscript" / "config.yaml").read_text(encoding="utf-8")
+        (PROJECT_ROOT / "docs" / "manuscript" / "config.yaml").read_text(encoding="utf-8")
     )
     assert isinstance(config, dict)
     rendered_abstract = abstract.replace(
@@ -262,13 +262,13 @@ def test_abstract_and_introduction_define_acronyms_and_notation() -> None:
 
 def test_reader_facing_power_distinguishes_investigator_agent_and_task_environment() -> None:
     """Keep the central estimand aligned with the executable scenario/policy split."""
-    perspective = (PROJECT_ROOT / "docs" / "evaluation_perspective.md").read_text(
+    perspective = (PROJECT_ROOT / "docs" / "research" / "evaluation_perspective.md").read_text(
         encoding="utf-8"
     )
-    methodology = (PROJECT_ROOT / "manuscript" / "02_methodology.md").read_text(
+    methodology = (PROJECT_ROOT / "docs" / "manuscript" / "02_methodology.md").read_text(
         encoding="utf-8"
     )
-    action_docs = (PROJECT_ROOT / "docs" / "action_in_the_loop.md").read_text(
+    action_docs = (PROJECT_ROOT / "docs" / "architecture" / "action_in_the_loop.md").read_text(
         encoding="utf-8"
     )
     scenario_source = (
@@ -299,17 +299,17 @@ def test_reader_facing_power_distinguishes_investigator_agent_and_task_environme
 
 def test_study_lanes_keep_agent_uncertainty_separate_from_the_estimand() -> None:
     """Prevent an action-loop mechanism from being misread as an agent score."""
-    perspective = (PROJECT_ROOT / "docs" / "evaluation_perspective.md").read_text(
+    perspective = (PROJECT_ROOT / "docs" / "research" / "evaluation_perspective.md").read_text(
         encoding="utf-8"
     )
-    action_docs = (PROJECT_ROOT / "docs" / "action_in_the_loop.md").read_text(
+    action_docs = (PROJECT_ROOT / "docs" / "architecture" / "action_in_the_loop.md").read_text(
         encoding="utf-8"
     )
-    faq = (PROJECT_ROOT / "docs" / "faq.md").read_text(encoding="utf-8")
-    introduction = (PROJECT_ROOT / "manuscript" / "01_introduction.md").read_text(
+    faq = (PROJECT_ROOT / "docs" / "guides" / "faq.md").read_text(encoding="utf-8")
+    introduction = (PROJECT_ROOT / "docs" / "manuscript" / "01_introduction.md").read_text(
         encoding="utf-8"
     )
-    scope = (PROJECT_ROOT / "manuscript" / "07_scope_and_related_work.md").read_text(
+    scope = (PROJECT_ROOT / "docs" / "manuscript" / "07_scope_and_related_work.md").read_text(
         encoding="utf-8"
     )
 
@@ -325,28 +325,28 @@ def test_study_lanes_keep_agent_uncertainty_separate_from_the_estimand() -> None
 
 def test_reader_terms_keep_evidence_randomness_cost_and_provenance_distinct() -> None:
     """Protect the technical distinctions that make the reader guide auditable."""
-    introduction = (PROJECT_ROOT / "manuscript" / "01_introduction.md").read_text(
+    introduction = (PROJECT_ROOT / "docs" / "manuscript" / "01_introduction.md").read_text(
         encoding="utf-8"
     )
-    methodology = (PROJECT_ROOT / "manuscript" / "02_methodology.md").read_text(
+    methodology = (PROJECT_ROOT / "docs" / "manuscript" / "02_methodology.md").read_text(
         encoding="utf-8"
     )
-    roadmap = (PROJECT_ROOT / "docs" / "research_roadmap.md").read_text(
+    roadmap = (PROJECT_ROOT / "docs" / "research" / "research_roadmap.md").read_text(
         encoding="utf-8"
     )
-    action_docs = (PROJECT_ROOT / "docs" / "action_in_the_loop.md").read_text(
+    action_docs = (PROJECT_ROOT / "docs" / "architecture" / "action_in_the_loop.md").read_text(
         encoding="utf-8"
     )
-    scholarship_map = (PROJECT_ROOT / "docs" / "scholarship_map.md").read_text(
+    scholarship_map = (PROJECT_ROOT / "docs" / "research" / "scholarship_map.md").read_text(
         encoding="utf-8"
     )
-    formalism_docs = (PROJECT_ROOT / "docs" / "formalism_to_code.md").read_text(
+    formalism_docs = (PROJECT_ROOT / "docs" / "architecture" / "formalism_to_code.md").read_text(
         encoding="utf-8"
     )
-    visualization_docs = (PROJECT_ROOT / "docs" / "visualization_notes.md").read_text(
+    visualization_docs = (PROJECT_ROOT / "docs" / "publication" / "visualization_notes.md").read_text(
         encoding="utf-8"
     )
-    faq = (PROJECT_ROOT / "docs" / "faq.md").read_text(encoding="utf-8")
+    faq = (PROJECT_ROOT / "docs" / "guides" / "faq.md").read_text(encoding="utf-8")
     ledger = yaml.safe_load(
         (PROJECT_ROOT / "data" / "claim_ledger.yaml").read_text(encoding="utf-8")
     )
@@ -393,7 +393,7 @@ def test_reader_terms_keep_evidence_randomness_cost_and_provenance_distinct() ->
 
 
 def test_conclusion_gives_a_design_decision_rule_not_a_universal_power_claim() -> None:
-    conclusion = (PROJECT_ROOT / "manuscript" / "04_conclusion.md").read_text(
+    conclusion = (PROJECT_ROOT / "docs" / "manuscript" / "04_conclusion.md").read_text(
         encoding="utf-8"
     )
     for phrase in (
@@ -408,7 +408,7 @@ def test_conclusion_gives_a_design_decision_rule_not_a_universal_power_claim() -
 
 
 def test_dense_adaptive_audit_starts_on_a_fresh_pdf_page_for_caption_legibility() -> None:
-    results = (PROJECT_ROOT / "manuscript" / "03_results.md").read_text(
+    results = (PROJECT_ROOT / "docs" / "manuscript" / "03_results.md").read_text(
         encoding="utf-8"
     )
     assert (
@@ -419,7 +419,7 @@ def test_dense_adaptive_audit_starts_on_a_fresh_pdf_page_for_caption_legibility(
 
 def test_final_formalism_panel_has_top_clearance_on_its_dedicated_page() -> None:
     """Prevent the final print matrix title from entering the PDF crop edge."""
-    methodology = (PROJECT_ROOT / "manuscript" / "02_methodology.md").read_text(
+    methodology = (PROJECT_ROOT / "docs" / "manuscript" / "02_methodology.md").read_text(
         encoding="utf-8"
     )
     assert (
@@ -435,7 +435,7 @@ def test_final_formalism_panel_has_top_clearance_on_its_dedicated_page() -> None
 
 def test_benchmark_stress_float_is_flushed_before_the_concluding_sections() -> None:
     """Keep the Results figure from splitting a Conclusion sentence in PDF."""
-    results = (PROJECT_ROOT / "manuscript" / "03_results.md").read_text(
+    results = (PROJECT_ROOT / "docs" / "manuscript" / "03_results.md").read_text(
         encoding="utf-8"
     )
     assert (
@@ -448,7 +448,7 @@ def test_benchmark_stress_float_is_flushed_before_the_concluding_sections() -> N
 
 
 def test_conclusion_states_the_deliverable_directly() -> None:
-    conclusion = (PROJECT_ROOT / "manuscript" / "04_conclusion.md").read_text(
+    conclusion = (PROJECT_ROOT / "docs" / "manuscript" / "04_conclusion.md").read_text(
         encoding="utf-8"
     )
     assert "The central result is a change in the question" not in conclusion
@@ -459,7 +459,7 @@ def test_conclusion_states_the_deliverable_directly() -> None:
 
 
 def test_research_roadmap_has_stage_controls() -> None:
-    roadmap = (PROJECT_ROOT / "docs" / "research_roadmap.md").read_text(
+    roadmap = (PROJECT_ROOT / "docs" / "research" / "research_roadmap.md").read_text(
         encoding="utf-8"
     )
     for required in (
@@ -561,8 +561,8 @@ def test_storey_review_ledger_uses_reader_facing_same_vector_language() -> None:
 
 
 def test_formalism_and_claim_audit_docs_are_linked() -> None:
-    formalism = (PROJECT_ROOT / "docs" / "formalism_to_code.md").read_text(encoding="utf-8")
-    audit = (PROJECT_ROOT / "docs" / "claim_audit.md").read_text(encoding="utf-8")
+    formalism = (PROJECT_ROOT / "docs" / "architecture" / "formalism_to_code.md").read_text(encoding="utf-8")
+    audit = (PROJECT_ROOT / "docs" / "validation" / "claim_audit.md").read_text(encoding="utf-8")
     for text in (formalism, audit):
         assert "formal object" in text
         assert "non-claim" in text
@@ -573,7 +573,7 @@ def test_formalism_and_claim_audit_docs_are_linked() -> None:
 
 def test_scope_chain_uses_reader_facing_arrows() -> None:
     """Keep the formal-to-code chain legible in the rendered reader guide."""
-    scope = (PROJECT_ROOT / "manuscript" / "07_scope_and_related_work.md").read_text(
+    scope = (PROJECT_ROOT / "docs" / "manuscript" / "07_scope_and_related_work.md").read_text(
         encoding="utf-8"
     )
     assert "formal object → public symbol →" in scope

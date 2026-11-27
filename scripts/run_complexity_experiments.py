@@ -10,7 +10,7 @@ under ``output/``, modifies a release artifact, hydrates a manuscript, or
 creates a promotion decision.
 
 The command has one public parameter: a previously absent ``--output-root``.
-The timing plan is frozen in ``manuscript/config.yaml``.  Programmatic callers
+The timing plan is frozen in ``docs/manuscript/config.yaml``.  Programmatic callers
 may pass a compact :class:`ComputationalComplexityPlan` for a real, bounded
 test; that escape hatch is intentionally unavailable from the CLI.
 """
@@ -45,7 +45,7 @@ import yaml
 
 
 ROOT = Path(__file__).resolve().parent.parent
-CONFIG_PATH = ROOT / "manuscript" / "config.yaml"
+CONFIG_PATH = ROOT / "docs" / "manuscript" / "config.yaml"
 TIMING_PROFILE_FILENAME = "complexity_experiments.json"
 TIMING_FIGURE_FILENAME = "complexity_experiments.png"
 TIMING_INDEX_FILENAME = "index.html"
@@ -149,14 +149,14 @@ def _frozen_plan() -> tuple[ComputationalComplexityPlan, str]:
         raise FileNotFoundError(f"frozen complexity plan is missing: {CONFIG_PATH}")
     payload = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8")) or {}
     if not isinstance(payload, Mapping):
-        raise ValueError("manuscript/config.yaml must contain a mapping")
+        raise ValueError("docs/manuscript/config.yaml must contain a mapping")
     experiment = payload.get("experiment")
     if not isinstance(experiment, Mapping):
-        raise ValueError("manuscript/config.yaml must define experiment as a mapping")
+        raise ValueError("docs/manuscript/config.yaml must define experiment as a mapping")
     raw_plan = experiment.get("computational_complexity")
     if not isinstance(raw_plan, Mapping):
         raise ValueError(
-            "manuscript/config.yaml must define experiment.computational_complexity as a mapping"
+            "docs/manuscript/config.yaml must define experiment.computational_complexity as a mapping"
         )
     return complexity_plan_from_mapping(raw_plan), sha256_file(CONFIG_PATH)
 
