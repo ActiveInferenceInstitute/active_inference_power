@@ -63,10 +63,10 @@ SHIPPED_SPECS = sorted((ROOT / SPEC_DIRNAME).glob("*.gnn.md"))
 
 #: The canonical workstream pin. Bumping it is a deliberate act: this test pins
 #: the pin, so a silent re-pin cannot pass unnoticed.
-CANONICAL_TAG = "v5.1.0"
-CANONICAL_COMMIT = "75c834bd8519dc7b5adc4d24f16bf393cfd1ecdf"
-CANONICAL_VERSION = "5.1.0"
-CANONICAL_RECORDED = "2026-11-12"
+CANONICAL_TAG = "v5.2.0"
+CANONICAL_COMMIT = "4a7cccce6d4d7cb483f00323ec5cdd79300f3464"
+CANONICAL_VERSION = "5.2.0"
+CANONICAL_RECORDED = "2026-11-28"
 
 #: Normative required sections of the GNN v1 compliance contract
 #: (``gnn.schemas.section_contract.REQUIRED_SECTIONS``); the pinned upstream
@@ -148,7 +148,7 @@ def upstream_run(tmp_path_factory: pytest.TempPathFactory) -> UpstreamRun:
 
 
 def test_pin_file_names_the_canonical_release() -> None:
-    """The shipped pin is the canonical workstream pin (v5.1.0)."""
+    """The shipped pin is the canonical workstream pin (v5.2.0)."""
     data = json.loads(PIN_PATH.read_text(encoding="utf-8"))
     assert data["tag"] == CANONICAL_TAG
     assert data["commit"] == CANONICAL_COMMIT

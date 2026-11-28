@@ -70,9 +70,9 @@ execution-source allowlist and does not change GNN ownership or pins.
 
 The authoritative pin is [`models/gnn-pin.json`](../models/gnn-pin.json), using
 schema `gnn-importer-pin/v1`. It identifies
-`ActiveInferenceInstitute/Generalized_Notation_Notation`, tag `v5.1.0`,
-version `5.1.0`, and exact commit
-`75c834bd8519dc7b5adc4d24f16bf393cfd1ecdf`. The parser entry point is
+`ActiveInferenceInstitute/Generalized_Notation_Notation`, tag `v5.2.0`,
+version `5.2.0`, and exact commit
+`4a7cccce6d4d7cb483f00323ec5cdd79300f3464`. The parser entry point is
 `gnn.parsers.markdown_parser:MarkdownGNNParser`; the pin also retains its
 recording dates. Do not replace this identity with the current upstream branch.
 
