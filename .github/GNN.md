@@ -4,8 +4,8 @@
 `gnn-conformance`. Its source of truth is
 [`models/gnn-pin.json`](../models/gnn-pin.json), schema
 `gnn-importer-pin/v1`, pinning
-`ActiveInferenceInstitute/Generalized_Notation_Notation` at tag `v5.1.0`,
-version `5.1.0`, commit `75c834bd8519dc7b5adc4d24f16bf393cfd1ecdf`,
+`ActiveInferenceInstitute/Generalized_Notation_Notation` at tag `v5.2.0`,
+version `5.2.0`, commit `4a7cccce6d4d7cb483f00323ec5cdd79300f3464`,
 with parser entry point `gnn.parsers.markdown_parser:MarkdownGNNParser`.
 
 The job clones that repository at the pinned tag into
