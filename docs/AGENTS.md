@@ -49,4 +49,4 @@ Run this after changing navigation or a local Markdown destination:
 Use `git diff --check` for Markdown whitespace and run the focused real-file
 tests when a documentation change is covered by a contract test. For
 reader-facing figures or publication instructions, also follow the rendered
-HTML/PDF review order in [rendering_pipeline.md](rendering_pipeline.md).
+HTML/PDF review order in [rendering_pipeline.md](publication/rendering_pipeline.md).

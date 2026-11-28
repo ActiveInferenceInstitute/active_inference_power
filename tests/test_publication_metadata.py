@@ -77,7 +77,7 @@ def _published_metadata() -> dict[str, str]:
 
 def _config() -> dict[str, object]:
     loaded = yaml.safe_load(
-        (PROJECT_ROOT / "manuscript" / "config.yaml").read_text(encoding="utf-8")
+        (PROJECT_ROOT / "docs" / "manuscript" / "config.yaml").read_text(encoding="utf-8")
     )
     assert isinstance(loaded, dict)
     return loaded
@@ -199,14 +199,14 @@ def test_public_license_and_fixture_notice_match_declared_metadata() -> None:
 def test_public_guidance_has_no_local_path_or_private_renderer_dependency() -> None:
     """Keep the published source usable without a maintainer-only checkout."""
     root_guide = (PROJECT_ROOT / "AGENTS.md").read_text(encoding="utf-8")
-    controlled = (PROJECT_ROOT / "docs" / "controlled_renderer.md").read_text(
+    controlled = (PROJECT_ROOT / "docs" / "publication" / "controlled_renderer.md").read_text(
         encoding="utf-8"
     )
     public_reader_files = (
         PROJECT_ROOT / "README.md",
         PROJECT_ROOT / "STANDALONE.md",
-        PROJECT_ROOT / "docs" / "quickstart.md",
-        PROJECT_ROOT / "manuscript" / "06_reproducibility.md",
+        PROJECT_ROOT / "docs" / "guides" / "quickstart.md",
+        PROJECT_ROOT / "docs" / "manuscript" / "06_reproducibility.md",
     )
 
     assert "/Users/" not in root_guide
@@ -220,13 +220,13 @@ def test_public_guidance_has_no_local_path_or_private_renderer_dependency() -> N
 
 
 def test_abstract_stays_repository_only_while_release_identity_is_elsewhere() -> None:
-    source = (PROJECT_ROOT / "manuscript" / "00_abstract.md").read_text(encoding="utf-8")
+    source = (PROJECT_ROOT / "docs" / "manuscript" / "00_abstract.md").read_text(encoding="utf-8")
     assert "{{PUBLICATION_REPOSITORY_STATEMENT}}" in source
     assert "{{PUBLICATION_ARCHIVE_STATEMENT}}" not in source
     assert "doi" not in source.lower()
     assert "zenodo" not in source.lower()
 
-    reproducibility = (PROJECT_ROOT / "manuscript" / "06_reproducibility.md").read_text(
+    reproducibility = (PROJECT_ROOT / "docs" / "manuscript" / "06_reproducibility.md").read_text(
         encoding="utf-8"
     )
     for token in (

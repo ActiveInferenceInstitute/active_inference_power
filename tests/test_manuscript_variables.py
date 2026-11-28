@@ -48,7 +48,7 @@ _EXCLUDED = {"AGENTS.md", "README.md", "SYNTAX.md"}
 
 def _manuscript_tokens() -> set[str]:
     tokens: set[str] = set()
-    for md in (PROJECT_ROOT / "manuscript").glob("*.md"):
+    for md in (PROJECT_ROOT / "docs" / "manuscript").glob("*.md"):
         if md.name in _EXCLUDED:
             continue
         tokens |= set(_TOKEN_RE.findall(md.read_text(encoding="utf-8")))
@@ -115,7 +115,7 @@ def test_every_manuscript_figure_pairs_a_caption_with_authored_alternative_text(
     )
     source = "\n".join(
         path.read_text(encoding="utf-8")
-        for path in (PROJECT_ROOT / "manuscript").glob("*.md")
+        for path in (PROJECT_ROOT / "docs" / "manuscript").glob("*.md")
         if path.name not in _EXCLUDED
     )
     images = list(image_pattern.finditer(source))
@@ -129,7 +129,7 @@ def test_every_manuscript_figure_pairs_a_caption_with_authored_alternative_text(
 def test_manuscript_has_no_known_stale_quantitative_literals():
     source = "\n".join(
         path.read_text(encoding="utf-8")
-        for path in (PROJECT_ROOT / "manuscript").glob("*.md")
+        for path in (PROJECT_ROOT / "docs" / "manuscript").glob("*.md")
         if path.name not in _EXCLUDED
     )
     stale = (
@@ -146,7 +146,7 @@ def test_manuscript_has_no_known_stale_quantitative_literals():
 def test_manuscript_numeric_literals_are_only_declared_allowlist_contexts():
     """Reject quantitative prose digits that bypass generated variables."""
     source_parts = []
-    for path in (PROJECT_ROOT / "manuscript").glob("*.md"):
+    for path in (PROJECT_ROOT / "docs" / "manuscript").glob("*.md"):
         if path.name in _EXCLUDED or path.name == "preamble.md":
             continue
         source_parts.append(path.read_text(encoding="utf-8"))
@@ -166,7 +166,7 @@ def test_manuscript_numeric_literals_are_only_declared_allowlist_contexts():
     literals = re.findall(r"(?<![A-Za-z])\d+(?:\.\d+)?%?", source)
     assert not literals, (
         "scientific numeric literals bypass generated variables; see "
-        "docs/manuscript_numeric_audit.md: " + ", ".join(literals)
+        "docs/validation/manuscript_numeric_audit.md: " + ", ".join(literals)
     )
 
 
@@ -184,7 +184,7 @@ def test_table_row_blocks_have_expected_shape(generated_fast_bundle: Path) -> No
     variables = generate_variables(
         PROJECT_ROOT, require_analysis_outputs=True, output_root=generated_fast_bundle
     )
-    config = yaml.safe_load((PROJECT_ROOT / "manuscript" / "config.yaml").read_text())
+    config = yaml.safe_load((PROJECT_ROOT / "docs" / "manuscript" / "config.yaml").read_text())
     # Configured procedures, effect grid, dependence grid, four certs, four AI rows.
     assert len(variables["RESULT_COMPARISON_ROWS"].splitlines()) == len(
         config["experiment"]["methods"]
@@ -407,7 +407,7 @@ def test_action_loop_table_uses_compact_display_labels(
 
 def test_action_loop_table_reader_key_preserves_policy_semantics() -> None:
     """Compact cells must not make the declared action rules ambiguous."""
-    source = (PROJECT_ROOT / "manuscript" / "03_results.md").read_text(
+    source = (PROJECT_ROOT / "docs" / "manuscript" / "03_results.md").read_text(
         encoding="utf-8"
     )
     start = source.index("## Conditional action-loop operating characteristics")
@@ -430,15 +430,15 @@ def test_config_tokens_from_config_yaml(generated_fast_bundle: Path) -> None:
     variables = generate_variables(
         PROJECT_ROOT, require_analysis_outputs=True, output_root=generated_fast_bundle
     )
-    config = yaml.safe_load((PROJECT_ROOT / "manuscript" / "config.yaml").read_text())
+    config = yaml.safe_load((PROJECT_ROOT / "docs" / "manuscript" / "config.yaml").read_text())
     assert variables["CONFIG_M"] == str(config["experiment"]["m"])
     assert variables["QUALITY_TEST_COUNT"] == "PENDING"
     assert variables["QUALITY_BRANCH_COVERAGE"] == "PENDING"
 
 
 def test_missing_results_raises(tmp_path):
-    (tmp_path / "manuscript").mkdir()
-    (tmp_path / "manuscript" / "config.yaml").write_text(
+    (tmp_path / "docs" / "manuscript").mkdir(parents=True)
+    (tmp_path / "docs" / "manuscript" / "config.yaml").write_text(
         "experiment: {m: 200, pi0: 0.8}\n"
     )
     with pytest.raises(FileNotFoundError):
@@ -446,8 +446,8 @@ def test_missing_results_raises(tmp_path):
 
 
 def test_draft_mode_falls_back_to_na(tmp_path):
-    (tmp_path / "manuscript").mkdir()
-    (tmp_path / "manuscript" / "config.yaml").write_text(
+    (tmp_path / "docs" / "manuscript").mkdir(parents=True)
+    (tmp_path / "docs" / "manuscript" / "config.yaml").write_text(
         "experiment: {m: 200, pi0: 0.8, effect: 3.0}\n"
     )
     variables = generate_variables(tmp_path, require_analysis_outputs=False)
@@ -471,8 +471,8 @@ def test_variable_helpers_fail_closed_and_preserve_explicit_empty_boundaries(
     assert _load_results(tmp_path) == {}
     assert _load_quality(tmp_path) == {}
 
-    manuscript = tmp_path / "manuscript"
-    manuscript.mkdir()
+    manuscript = tmp_path / "docs" / "manuscript"
+    manuscript.mkdir(parents=True)
     (manuscript / "config.yaml").write_text("experiment: {m: 7}\n", encoding="utf-8")
     payload_root = tmp_path / "isolated"
     payload_root.mkdir()

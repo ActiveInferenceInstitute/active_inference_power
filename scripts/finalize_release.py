@@ -478,7 +478,7 @@ def main() -> int:
         "--config",
         type=Path,
         default=None,
-        help="Exact preregistered configuration source; defaults to manuscript/config.yaml.",
+        help="Exact preregistered configuration source; defaults to docs/manuscript/config.yaml.",
     )
     parser.add_argument(
         "--allow-unrendered-review",

@@ -627,7 +627,7 @@ def main() -> int:
     parser.add_argument(
         "--manuscript-dir",
         type=Path,
-        default=_PROJECT_ROOT / "manuscript",
+        default=_PROJECT_ROOT / "docs" / "manuscript",
         help="Source manuscript directory (default: project manuscript/).",
     )
     parser.add_argument(

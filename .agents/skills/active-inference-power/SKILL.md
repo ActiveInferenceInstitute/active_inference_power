@@ -22,7 +22,7 @@ See [the gate run guide](../../../docs/RUN_GUIDE.md) for individual arms;
 CI calls the same dispatcher. The fast selection is not release-quality evidence.
 
 For an isolated release candidate, follow the complete documented sequence in
-[`docs/agent_instructions.md`](../../../docs/agent_instructions.md): result
+[`docs/guides/agent_instructions.md`](../../../docs/guides/agent_instructions.md): result
 generation, quality report, strict hydration, audits, sibling render,
 unskipped review, and finalization all use the same new output root. The
 quality suite creates its own real session-scoped temporary bundles, so draft
@@ -59,4 +59,4 @@ renders nor replaces the isolated candidate chain.
 
 - [`AGENTS.md`](../../../AGENTS.md)
 - [`README.md`](../../../README.md)
-- [`docs/PACKAGE_CONTRACT.md`](../../../docs/PACKAGE_CONTRACT.md)
+- [`docs/publication/PACKAGE_CONTRACT.md`](../../../docs/publication/PACKAGE_CONTRACT.md)

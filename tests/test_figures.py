@@ -520,13 +520,13 @@ def test_figure_documentation_inventories_track_every_generated_figure() -> None
     assert {f"output/figures/{name}" for name in FIGURE_NAMES}.issubset(expected_artifacts)
     assert tuple(plan["expected_figures"]) == labels
 
-    syntax = (PROJECT_ROOT / "manuscript" / "SYNTAX.md").read_text(encoding="utf-8")
-    inventory = (PROJECT_ROOT / "docs" / "output_inventory.md").read_text(encoding="utf-8")
+    syntax = (PROJECT_ROOT / "docs" / "manuscript" / "SYNTAX.md").read_text(encoding="utf-8")
+    inventory = (PROJECT_ROOT / "docs" / "reference" / "output_inventory.md").read_text(encoding="utf-8")
     for spec, filename in zip(FIGURE_SPECS, FIGURE_NAMES, strict=True):
         assert spec.label in syntax
         assert f"output/figures/{filename}" in syntax
         assert f"<bundle-root>/figures/{filename}" in inventory
-    for document in ("docs/output_inventory.md", "docs/output_conventions.md"):
+    for document in ("docs/reference/output_inventory.md", "docs/reference/output_conventions.md"):
         text = (PROJECT_ROOT / document).read_text(encoding="utf-8")
         assert "evaluation-perspective" in text
 
@@ -762,10 +762,10 @@ def test_figure_metadata_ignores_non_list_scenario_blocks() -> None:
 
 def test_cover_asset_is_configured_and_valid() -> None:
     publication_config = yaml.safe_load(
-        (PROJECT_ROOT / "manuscript" / "config.yaml").read_text(encoding="utf-8")
+        (PROJECT_ROOT / "docs" / "manuscript" / "config.yaml").read_text(encoding="utf-8")
     )
     cover = publication_config["paper"]["cover"]
-    cover_path = PROJECT_ROOT / "manuscript" / cover["image"]
+    cover_path = PROJECT_ROOT / "docs" / "manuscript" / cover["image"]
     assert cover["title"]
     assert cover["description"]
     assert cover_path.is_file()

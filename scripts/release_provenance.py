@@ -26,7 +26,7 @@ _EXECUTION_ROOT_FILES = (
     "uv.lock",
     "domain_profile.yaml",
     "experiment_plan.yaml",
-    "manuscript/config.yaml",
+    "docs/manuscript/config.yaml",
 )
 
 
@@ -41,14 +41,14 @@ def require_file(path: Path, description: str) -> Path:
 def resolve_config_path(config_path: Path | None, *, project_root: Path) -> Path:
     """Resolve one explicit, non-empty scientific configuration source.
 
-    A publication bundle defaults to ``manuscript/config.yaml``.  An isolated
+    A publication bundle defaults to ``docs/manuscript/config.yaml``.  An isolated
     research lane may name a different preregistered file, but callers must
     supply that path explicitly so provenance validation can bind it to the
     manifest witness instead of silently accepting whichever config happens to
     be present in the canonical location.
     """
     project = Path(project_root).resolve()
-    candidate = project / "manuscript" / "config.yaml" if config_path is None else Path(config_path)
+    candidate = project / "docs" / "manuscript" / "config.yaml" if config_path is None else Path(config_path)
     if not candidate.is_absolute():
         candidate = project / candidate
     return require_file(candidate.resolve(), "source configuration")
@@ -358,7 +358,7 @@ def checkpoint_names_from_run_log(run_log: Mapping[str, Any]) -> tuple[str, ...]
 
 def manuscript_source_paths(project_root: Path) -> tuple[Path, ...]:
     """Return every source file that contributes to a resolved manuscript tree."""
-    manuscript = Path(project_root) / "manuscript"
+    manuscript = Path(project_root) / "docs" / "manuscript"
     excluded = {"AGENTS.md", "README.md", "SYNTAX.md", "preamble.md"}
     paths = [
         path
@@ -415,7 +415,7 @@ def renderer_input_hash(*, project_root: Path, output_root: Path) -> str:
 
     resolved_source_paths: set[str] = set()
     for source in manuscript_source_paths(project):
-        relative = source.relative_to(project / "manuscript").as_posix()
+        relative = source.relative_to(project / "docs" / "manuscript").as_posix()
         add(f"source:{relative}", source)
         if relative.startswith("assets/"):
             continue
@@ -573,7 +573,7 @@ def required_release_artifacts(
     output = Path(output_root).resolve()
     expected: dict[str, tuple[Path, str]] = {}
     for name, relative, role in (
-        ("config", project / "manuscript" / "config.yaml", "configuration"),
+        ("config", project / "docs" / "manuscript" / "config.yaml", "configuration"),
         ("claim_ledger", project / "data" / "claim_ledger.yaml", "claim_ledger"),
         ("results", output / "results.json", "deterministic_results"),
         ("certificates", output / "certificates.json", "certificate_results"),
@@ -607,7 +607,7 @@ def required_release_artifacts(
             "stage_checkpoint",
         )
     for source in manuscript_source_paths(project):
-        relative = source.relative_to(project / "manuscript")
+        relative = source.relative_to(project / "docs" / "manuscript")
         _expected_record(
             expected,
             f"source_manuscript:{relative.as_posix()}",
@@ -616,7 +616,7 @@ def required_release_artifacts(
         )
     resolved = output / "manuscript"
     for source in manuscript_source_paths(project):
-        relative = source.relative_to(project / "manuscript")
+        relative = source.relative_to(project / "docs" / "manuscript")
         if relative.parts and relative.parts[0] == "assets":
             continue
         _expected_record(

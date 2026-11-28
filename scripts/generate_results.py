@@ -2158,7 +2158,7 @@ def main() -> int:
     parser.add_argument(
         "--config",
         type=Path,
-        default=ROOT / "manuscript" / "config.yaml",
+        default=ROOT / "docs" / "manuscript" / "config.yaml",
         help="Experiment YAML configuration.",
     )
     parser.add_argument(

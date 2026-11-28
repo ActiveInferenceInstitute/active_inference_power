@@ -21,9 +21,9 @@ from scripts.release_provenance import (
 
 
 def _bundle(tmp_path: Path) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any]]:
-    config = tmp_path / "manuscript" / "config.yaml"
+    config = tmp_path / "docs" / "manuscript" / "config.yaml"
     ledger = tmp_path / "data" / "claim_ledger.yaml"
-    config.parent.mkdir()
+    config.parent.mkdir(parents=True)
     ledger.parent.mkdir()
     config.write_text("experiment: {alpha: 0.05}\n", encoding="utf-8")
     ledger.write_text("claims: []\n", encoding="utf-8")
@@ -56,7 +56,7 @@ def test_source_witnesses_bind_manifest_results_run_log_and_live_sources(tmp_pat
         run_log,
         project_root=tmp_path,
         output_root=tmp_path / "output",
-        config_path=tmp_path / "manuscript" / "config.yaml",
+        config_path=tmp_path / "docs" / "manuscript" / "config.yaml",
         claim_ledger_path=tmp_path / "data" / "claim_ledger.yaml",
     )
     assert proven["config_sha256"] == results["meta"]["config_sha256"]
@@ -68,7 +68,7 @@ def test_isolated_lane_config_requires_its_exact_preregistered_path(
 ) -> None:
     manifest, results, run_log = _bundle(tmp_path)
     lane_config = tmp_path / "research_lanes" / "campaign_preregistered.yaml"
-    lane_config.parent.mkdir()
+    lane_config.parent.mkdir(parents=True)
     lane_config.write_text("experiment: {alpha: 0.025}\n", encoding="utf-8")
     lane_record = artifact_record(lane_config, tmp_path, "configuration")
     lane_digest = str(lane_record["sha256"])
@@ -99,7 +99,7 @@ def test_isolated_lane_config_requires_its_exact_preregistered_path(
             run_log,
             project_root=tmp_path,
             output_root=tmp_path / "output",
-            config_path=tmp_path / "manuscript" / "config.yaml",
+            config_path=tmp_path / "docs" / "manuscript" / "config.yaml",
             claim_ledger_path=tmp_path / "data" / "claim_ledger.yaml",
         )
     with pytest.raises(ValueError, match="source configuration is missing or empty"):
@@ -185,7 +185,7 @@ def test_campaign_lane_predecessor_receipts_are_safe_and_bound(tmp_path: Path) -
 @pytest.mark.parametrize(
     ("path", "replacement", "message"),
     [
-        ("manuscript/config.yaml", "experiment: {alpha: 0.01}\n", "configuration"),
+        ("docs/manuscript/config.yaml", "experiment: {alpha: 0.01}\n", "configuration"),
         ("data/claim_ledger.yaml", "claims: [changed]\n", "claim-ledger"),
     ],
 )
@@ -201,7 +201,7 @@ def test_source_witnesses_reject_live_input_drift(
             run_log,
             project_root=tmp_path,
             output_root=tmp_path / "output",
-            config_path=tmp_path / "manuscript" / "config.yaml",
+            config_path=tmp_path / "docs" / "manuscript" / "config.yaml",
             claim_ledger_path=tmp_path / "data" / "claim_ledger.yaml",
         )
 
@@ -219,7 +219,7 @@ def test_source_witnesses_reject_manifest_result_disagreement(tmp_path: Path) ->
             run_log,
             project_root=tmp_path,
             output_root=tmp_path / "output",
-            config_path=tmp_path / "manuscript" / "config.yaml",
+            config_path=tmp_path / "docs" / "manuscript" / "config.yaml",
             claim_ledger_path=tmp_path / "data" / "claim_ledger.yaml",
         )
 
@@ -272,7 +272,7 @@ def test_checkpoint_provenance_requires_exact_bundle_lineage() -> None:
 def test_renderer_input_hash_normalizes_its_embedded_witness_and_tracks_inputs(
     tmp_path: Path,
 ) -> None:
-    source = tmp_path / "manuscript"
+    source = tmp_path / "docs" / "manuscript"
     resolved = tmp_path / "output" / "manuscript"
     figures = tmp_path / "output" / "figures"
     data = tmp_path / "output" / "data"
@@ -323,8 +323,8 @@ def test_execution_source_digest_binds_manifest_results_run_log_and_live_tree(
     package.mkdir(parents=True)
     scripts.mkdir()
     benchmarks.mkdir(parents=True)
-    manuscript = tmp_path / "manuscript"
-    manuscript.mkdir()
+    manuscript = tmp_path / "docs" / "manuscript"
+    manuscript.mkdir(parents=True)
     (package / "module.py").write_text("VALUE = 1\n", encoding="utf-8")
     for name in (
         "generate_results.py",

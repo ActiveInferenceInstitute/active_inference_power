@@ -37,8 +37,8 @@ these fixtures. Read the repository-level
 [`THIRD_PARTY_NOTICES.md`](../../THIRD_PARTY_NOTICES.md) together with the
 manifest before redistributing a fixture or substituting another source.
 
-See the [research roadmap](../../docs/research_roadmap.md) for the gate before
-external-data expansion and the [claim audit](../../docs/claim_audit.md) for
+See the [research roadmap](../../docs/research/research_roadmap.md) for the gate before
+external-data expansion and the [claim audit](../../docs/validation/claim_audit.md) for
 the evidence-boundary convention. See
-[output conventions](../../docs/output_conventions.md) for the preflight
+[output conventions](../../docs/reference/output_conventions.md) for the preflight
 artifact layout.

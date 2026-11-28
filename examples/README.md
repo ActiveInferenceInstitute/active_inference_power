@@ -45,5 +45,5 @@ Cost comparisons are scenario-local: compare $C$ or power-per-cost only when
 the declared `cost_unit` and `cost_scale_id` match.
 
 For the full producer/review chain, see the project
-[quickstart](../docs/quickstart.md) and the
-[action-in-the-loop contract](../docs/action_in_the_loop.md).
+[quickstart](../docs/guides/quickstart.md) and the
+[action-in-the-loop contract](../docs/architecture/action_in_the_loop.md).

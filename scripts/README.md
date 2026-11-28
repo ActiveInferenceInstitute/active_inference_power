@@ -122,6 +122,6 @@ and tested independently. Support modules such as `artifacts.py`,
 by the public producers; do not invoke them as alternate release paths.
 
 See the [gate run guide](../docs/RUN_GUIDE.md),
-[release review](../docs/release_review.md),
-[figure accessibility](../docs/figure_accessibility.md), and the
+[release review](../docs/publication/release_review.md),
+[figure accessibility](../docs/publication/figure_accessibility.md), and the
 [documentation hub](../docs/README.md) for the public command contracts.

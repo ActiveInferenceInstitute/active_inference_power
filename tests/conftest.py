@@ -43,7 +43,7 @@ def generated_fast_bundle(tmp_path_factory: pytest.TempPathFactory) -> Path:
 
     output_root = tmp_path_factory.mktemp("generated-fast-bundle") / "output"
     results = run(
-        ROOT / "manuscript" / "config.yaml",
+        ROOT / "docs" / "manuscript" / "config.yaml",
         profile="fast",
         workers=1,
         output_root=output_root,

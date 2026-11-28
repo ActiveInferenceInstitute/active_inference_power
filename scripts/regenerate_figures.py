@@ -105,7 +105,7 @@ def refresh(output_root: Path | None = None) -> dict[str, Any]:
         run_log,
         project_root=ROOT,
         output_root=output,
-        config_path=ROOT / "manuscript" / "config.yaml",
+        config_path=ROOT / "docs" / "manuscript" / "config.yaml",
         claim_ledger_path=ROOT / "data" / "claim_ledger.yaml",
     )
     # Persist an incomplete state before replacing any PNG. A process failure

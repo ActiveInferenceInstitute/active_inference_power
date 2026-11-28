@@ -52,7 +52,7 @@ artifact_expectations:
   - output/certificates.json
   - output/quality.json
   - output/manifest.json
-  - manuscript/assets/active_inference_power_cover.png
+  - docs/manuscript/assets/active_inference_power_cover.png
   - output/figures/method_comparison.png
   - output/figures/power_curve.png
   - output/figures/dependence_sweep.png

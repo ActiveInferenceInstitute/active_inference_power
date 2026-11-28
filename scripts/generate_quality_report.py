@@ -42,7 +42,6 @@ QUALITY_INPUT_DIRECTORIES = (
     "tests",
     "examples",
     "docs",
-    "manuscript",
     "data",
     "models",
     ".agents",
